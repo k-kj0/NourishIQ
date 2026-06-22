@@ -36,7 +36,6 @@ export function ExploreTab() {
     <div className="px-5 pt-12 pb-4">
       <h1 className="text-2xl font-black mb-4">Explore</h1>
 
-      {/* Search */}
       <div className="relative mb-4">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
         <input
@@ -48,7 +47,6 @@ export function ExploreTab() {
         />
       </div>
 
-      {/* Filters */}
       <div className="flex gap-2 overflow-x-auto no-scrollbar mb-4">
         <button
           onClick={() => setShowFilterPopup(true)}
@@ -72,7 +70,6 @@ export function ExploreTab() {
         ))}
       </div>
 
-      {/* Appliance Filter Popup */}
       {showFilterPopup && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}
@@ -102,7 +99,6 @@ export function ExploreTab() {
         </motion.div>
       )}
 
-      {/* Grid */}
       <div className="grid grid-cols-2 gap-3">
         {filtered.map((meal, i) => (
           <motion.button
