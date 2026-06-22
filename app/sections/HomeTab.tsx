@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../AppContext";
 import { KawaiiCharacter } from "../components/KawaiiCharacter";
-import { Settings, Moon, Sun, Heart, X, RefreshCw, ChevronRight, Plus, Minus, Droplets } from "lucide-react";
+import { Settings, Moon, Sun, Heart, RefreshCw, Droplets } from "lucide-react";
 import { getGreeting, getDaysInMonth } from "../lib/mealData";
 import { RecipeSheet } from "../components/RecipeSheet";
 
@@ -13,7 +13,7 @@ export function HomeTab() {
     userProfile, selectedDate, setSelectedDate, dayPlan,
     toggleLikeMeal, regenerateMealForDay, setSelectedMeal, setShowRecipeSheet,
     includeDessert, setIncludeDessert, includeBeverage, setIncludeBeverage,
-    mealsPerDay, setMealsPerDay, loggedMeals, toggleLoggedMeal,
+    mealsPerDay, loggedMeals, toggleLoggedMeal,
     cravingQuery, setCravingQuery, searchCravings, cravingResults,
   } = useApp();
 
@@ -40,7 +40,6 @@ export function HomeTab() {
 
   return (
     <div className="px-5 pt-12 pb-4">
-      {/* Header */}
       <div className="flex items-start justify-between mb-4">
         <div>
           <h1 className="flex items-center gap-2 text-[22px] font-black leading-tight">
@@ -70,7 +69,6 @@ export function HomeTab() {
         </button>
       </div>
 
-      {/* Calendar */}
       <div className="mb-4">
         <p className="text-xs font-bold uppercase tracking-wider text-gray-500">
           {today.toLocaleDateString("en-US", { month: "long", year: "numeric" })}
@@ -104,7 +102,6 @@ export function HomeTab() {
         </div>
       </div>
 
-      {/* Daily Summary */}
       <div className="flex gap-2 mb-4">
         <div className="flex-1 rounded-2xl bg-leaf/10 text-leaf px-3 py-2">
           <p className="text-[10px] font-bold uppercase opacity-70">kcal</p>
@@ -129,7 +126,6 @@ export function HomeTab() {
         </div>
       </div>
 
-      {/* Toggles */}
       <div className="flex gap-2 mb-4 flex-wrap">
         <button
           onClick={() => setIncludeDessert(!includeDessert)}
@@ -162,7 +158,6 @@ export function HomeTab() {
         </button>
       </div>
 
-      {/* Craving Input */}
       <AnimatePresence>
         {showCravingInput && (
           <motion.div
@@ -208,7 +203,6 @@ export function HomeTab() {
         )}
       </AnimatePresence>
 
-      {/* Meal Cards */}
       <div className="space-y-4">
         <AnimatePresence>
           {dayPlan.meals.map((meal, index) => (
@@ -246,7 +240,6 @@ export function HomeTab() {
                 </div>
               </button>
 
-              {/* Action buttons */}
               <div className="absolute right-3 top-3 flex gap-1.5">
                 <motion.button
                   whileTap={{ scale: 0.8 }}
@@ -270,14 +263,12 @@ export function HomeTab() {
                 </motion.button>
               </div>
 
-              {/* Frequency badge */}
               {meal.frequency && (
                 <div className="absolute bottom-3 right-3 rounded-full bg-leaf/10 px-3 py-1 text-[10px] font-bold text-leaf">
                   {meal.frequency}
                 </div>
               )}
 
-              {/* Meal log */}
               {showMealLog && (
                 <div className="px-4 pb-3">
                   <button
@@ -300,7 +291,6 @@ export function HomeTab() {
         </AnimatePresence>
       </div>
 
-      {/* Custom meal builder */}
       <motion.button
         whileTap={{ scale: 0.98 }}
         className="relative flex w-full items-center gap-3 overflow-hidden rounded-3xl gradient-grape p-5 text-left text-white shadow-soft mt-4"
