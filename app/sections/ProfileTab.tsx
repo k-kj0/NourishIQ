@@ -24,7 +24,6 @@ export function ProfileTab() {
 
   return (
     <div className="px-5 pt-12 pb-4">
-      {/* Avatar */}
       <div className="flex flex-col items-center mb-6">
         <div className="relative">
           <div className="w-20 h-20 rounded-full gradient-leaf flex items-center justify-center text-white font-black text-2xl">
@@ -41,7 +40,6 @@ export function ProfileTab() {
         <p className="text-gray-500 text-sm">{userProfile.goal} • {userProfile.diet}</p>
       </div>
 
-      {/* Edit Profile Modal */}
       <AnimatePresence>
         {showEditProfile && (
           <motion.div
@@ -98,7 +96,6 @@ export function ProfileTab() {
         )}
       </AnimatePresence>
 
-      {/* Daily Check-in */}
       <div className="bg-white rounded-3xl p-5 shadow-card mb-4">
         <h3 className="font-black text-lg mb-4">Daily Check-in</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -126,7 +123,6 @@ export function ProfileTab() {
         </div>
       </div>
 
-      {/* Calorie History */}
       <div className="bg-white rounded-3xl p-5 shadow-card mb-4">
         <h3 className="font-black text-lg mb-4 flex items-center gap-2">
           <TrendingUp className="w-5 h-5 text-leaf" /> Calorie Tracker
@@ -153,7 +149,6 @@ export function ProfileTab() {
         )}
       </div>
 
-      {/* Actions */}
       <motion.button
         whileTap={{ scale: 0.98 }}
         onClick={resetApp}
