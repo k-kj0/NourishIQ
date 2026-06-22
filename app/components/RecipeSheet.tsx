@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useApp } from "../AppContext";
-import { X, Heart, RefreshCw, Clock, ChefHat, MessageCircle, Droplets } from "lucide-react";
+import { X, Heart, RefreshCw, Clock, ChefHat, MessageCircle } from "lucide-react";
 import { KawaiiCharacter } from "./KawaiiCharacter";
 
 export function RecipeSheet() {
@@ -33,7 +33,6 @@ export function RecipeSheet() {
             className="w-full max-w-[460px] bg-cream rounded-t-[32px] max-h-[90vh] overflow-y-auto no-scrollbar"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Image */}
             <div className="relative h-56 w-full overflow-hidden rounded-t-[32px]">
               <img src={selectedMeal.image} alt={selectedMeal.name} className="h-full w-full object-cover" />
               <button
@@ -52,14 +51,12 @@ export function RecipeSheet() {
             </div>
 
             <div className="px-6 py-6">
-              {/* Title with Kawaii */}
               <div className="flex items-center gap-3 mb-2">
                 <h2 className="text-2xl font-black">{selectedMeal.name}</h2>
                 <KawaiiCharacter emotion="eating" size={40} />
               </div>
               <p className="text-gray-500 text-sm mb-4">{selectedMeal.ingredients.join(" · ")}</p>
 
-              {/* Macros */}
               <div className="bg-white rounded-2xl p-4 shadow-card mb-4">
                 <div className="flex items-center justify-between">
                   <div className="relative w-24 h-24">
@@ -96,7 +93,6 @@ export function RecipeSheet() {
                 </div>
               </div>
 
-              {/* Gender benefits */}
               {selectedMeal.genderBenefits && (
                 <div className="bg-pink-50 rounded-2xl p-4 mb-4 border-2 border-pink-100">
                   <div className="flex items-center gap-2 mb-2">
@@ -109,7 +105,6 @@ export function RecipeSheet() {
                 </div>
               )}
 
-              {/* Benefits */}
               <div className="bg-leaf/5 rounded-2xl p-4 mb-4">
                 <p className="text-xs font-bold text-leaf uppercase mb-2">Benefits</p>
                 {selectedMeal.benefits.map((b, i) => (
@@ -117,7 +112,6 @@ export function RecipeSheet() {
                 ))}
               </div>
 
-              {/* Ingredients */}
               <h3 className="font-black text-lg mb-3 flex items-center gap-2">
                 <ChefHat className="w-5 h-5 text-leaf" /> Ingredients
               </h3>
@@ -129,7 +123,6 @@ export function RecipeSheet() {
                 ))}
               </div>
 
-              {/* Spices */}
               <h3 className="font-black text-lg mb-3">Spices</h3>
               <div className="flex flex-wrap gap-2 mb-4">
                 {selectedMeal.spices.map((spice) => (
@@ -139,7 +132,6 @@ export function RecipeSheet() {
                 ))}
               </div>
 
-              {/* Steps */}
               <h3 className="font-black text-lg mb-3 flex items-center gap-2">
                 <Clock className="w-5 h-5 text-coral" /> Steps
               </h3>
@@ -157,8 +149,7 @@ export function RecipeSheet() {
                 ))}
               </div>
 
-              {/* Substitutes */}
-              <h3 className="font-black text-lg mb-3">Don&apos;t have an ingredient?</h3>
+              <h3 className="font-black text-lg mb-3">Don't have an ingredient?</h3>
               <div className="space-y-2 mb-6">
                 {selectedMeal.substitutes.map((sub) => (
                   <div key={sub.ingredient} className="bg-white rounded-2xl p-4 shadow-card">
@@ -168,7 +159,6 @@ export function RecipeSheet() {
                 ))}
               </div>
 
-              {/* Action buttons */}
               <div className="flex gap-3 mb-4">
                 <motion.button
                   whileTap={{ scale: 0.95 }}
