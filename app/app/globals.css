@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-cream text-gray-900;
+  }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .gradient-leaf {
+    background: linear-gradient(135deg, #84cc16, #65a30d);
+  }
+  .gradient-coral {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+  }
+  .gradient-grape {
+    background: linear-gradient(135deg, #a855f7, #7e22ce);
+  }
+  .gradient-ocean {
+    background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  }
+  .gradient-sweet {
+    background: linear-gradient(135deg, #ec4899, #db2777);
+  }
+  .shadow-card {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+  .shadow-glow {
+    box-shadow: 0 4px 20px rgba(132, 204, 22, 0.3);
+  }
+  .shadow-soft {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  }
+}
