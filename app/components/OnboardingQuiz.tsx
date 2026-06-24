@@ -37,7 +37,7 @@ export function OnboardingQuiz() {
 
   // ==================== ANIMATED WELCOME SCREEN ====================
   const WelcomeStep = () => (
-    <div className="min-h-[100dvh] flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-green-50 via-white to-orange-50 px-6">
+    <div className="flex flex-col items-center justify-center relative overflow-hidden bg-gradient-to-b from-green-50 via-white to-orange-50 px-6 py-12 min-h-[calc(100dvh-80px)]">
       {/* Animated background blobs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -108,7 +108,7 @@ export function OnboardingQuiz() {
         initial={{ scale: 0, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.3 }}
-        className="mb-4"
+        className="mb-4 relative z-10"
       >
         <KawaiiCharacter emotion="wave" size={100} />
       </motion.div>
@@ -118,10 +118,10 @@ export function OnboardingQuiz() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5, duration: 0.6 }}
-        className="text-center mb-2"
+        className="text-center mb-2 relative z-10"
       >
         <h1
-          className="text-6xl font-black tracking-tight"
+          className="text-5xl font-black tracking-tight"
           style={{
             background: "linear-gradient(90deg, #22c55e, #f97316, #a855f7, #3b82f6, #22c55e)",
             backgroundSize: "300% 100%",
@@ -140,7 +140,7 @@ export function OnboardingQuiz() {
         initial={{ width: 0 }}
         animate={{ width: 120 }}
         transition={{ delay: 1, duration: 0.8, ease: "easeOut" }}
-        className="h-1.5 rounded-full mb-4"
+        className="h-1.5 rounded-full mb-4 relative z-10"
         style={{
           background: "linear-gradient(90deg, #22c55e, #f97316)",
         }}
@@ -151,7 +151,7 @@ export function OnboardingQuiz() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8, duration: 0.5 }}
-        className="text-lg text-gray-600 font-medium mb-8 text-center"
+        className="text-lg text-gray-600 font-medium mb-8 text-center relative z-10"
       >
         Your food, your rules.
       </motion.p>
@@ -161,7 +161,7 @@ export function OnboardingQuiz() {
         initial={{ opacity: 0, y: 15 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 1, duration: 0.5 }}
-        className="flex gap-3 mb-10 flex-wrap justify-center"
+        className="flex gap-3 mb-10 flex-wrap justify-center relative z-10"
       >
         {[
           { label: "Personalized", color: "#22c55e", bg: "#dcfce7" },
@@ -189,7 +189,7 @@ export function OnboardingQuiz() {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={goNext}
-        className="px-10 py-4 rounded-2xl text-white font-bold text-lg shadow-lg flex items-center gap-2"
+        className="px-10 py-4 rounded-2xl text-white font-bold text-lg shadow-lg flex items-center gap-2 relative z-10"
         style={{
           background: "linear-gradient(135deg, #22c55e, #16a34a)",
           boxShadow: "0 10px 40px rgba(34, 197, 94, 0.3)",
@@ -209,7 +209,7 @@ export function OnboardingQuiz() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.8 }}
-        className="flex gap-2 mt-8"
+        className="flex gap-2 mt-8 relative z-10"
       >
         {[0, 1, 2].map((i) => (
           <motion.div
