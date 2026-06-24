@@ -152,9 +152,6 @@ export interface CalorieLog {
   target: number;
 }
 
-// ==================== MEAL DATA ====================
-// 7 different daily meal sets for variety (rotates by day of month)
-
 const BREAKFAST_SETS: Meal[][] = [
   [{
     id: "b1", name: "Blueberry Oat Pancakes", category: "breakfast",
@@ -864,6 +861,64 @@ const BEVERAGE_SETS: Meal[][] = [
     image: "https://images.unsplash.com/photo-1505252585461-04db1eb84625?w=800&q=80",
   }],
 ];
+
+// ==================== ALL MEALS FLAT LIST ====================
+export const ALL_MEALS: Meal[] = [
+  ...BREAKFAST_SETS.flat(),
+  ...LUNCH_SETS.flat(),
+  ...DINNER_SETS.flat(),
+  ...SNACK_SETS.flat(),
+  ...DESSERT_SETS.flat(),
+  ...BEVERAGE_SETS.flat(),
+];
+
+// ==================== FUNCTIONS ====================
+function getDayIndex(dateStr: string): number {
+  const date = new Date(dateStr);
+  return date.getDate() % 7;
+}
+
+export function generateDailyPlan(
+  dateStr: string,
+  includeDessert: boolean = false,
+  includeBeverage: boolean = false,
+  mealsPerDay: number = 3
+): DayPlan {
+  const dayIndex = getDayIndex(dateStr);
+  const meals: Meal[] = [];
+
+  meals.push({ ...BREAKFAST_SETS[dayIndex][0] });
+
+  meals.push({ ...LUNCH_SETS[dayIndex][0] });
+
+  meals.push({ ...DINNER_SETS[dayIndex][0] });
+
+  if (mealsPerDay >= 4) {
+    meals.push({ ...SNACK_SETS[dayIndex][0] });
+  }
+
+  if (includeDessert) {
+    meals.push({ ...DESSERT_SETS[dayIndex][0] });
+  }
+
+  if (includeBeverage) {
+    meals.push({ ...BEVERAGE_SETS[dayIndex][0] });
+  }
+
+  const totalCalories = meals.reduce((sum, m) => sum + m.calories, 0);
+  const totalProtein = meals.reduce((sum, m) => sum + m.protein, 0);
+  const totalCarbs = meals.reduce((sum, m) => sum + m.carbs, 0);
+
+  return {
+    meals,
+    targetCalories: 1840,
+    targetProtein: 95,
+    targetCarbs: 180,
+    totalCalories,
+    totalProtein,
+    totalCarbs,
+  };
+}
 
 export function regenerateMeal(
   dateStr: string,
