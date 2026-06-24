@@ -35,27 +35,178 @@ export function OnboardingQuiz() {
     exit: (dir: number) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
   };
 
+  // ==================== ANIMATED WELCOME SCREEN ====================
   const WelcomeStep = () => (
-    <div className="flex flex-col items-center justify-center h-full px-6 pt-20 pb-8 text-center">
+    <div className="flex flex-col items-center justify-center h-full px-6 pt-16 pb-8 text-center relative overflow-hidden">
+      {/* Floating background elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          className="absolute top-10 left-4 w-16 h-16 rounded-full bg-leaf/20 blur-xl"
+          animate={{ y: [0, -20, 0], x: [0, 10, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute top-32 right-6 w-20 h-20 rounded-full bg-coral/20 blur-xl"
+          animate={{ y: [0, 15, 0], x: [0, -15, 0], scale: [1, 1.3, 1] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        />
+        <motion.div
+          className="absolute bottom-40 left-8 w-12 h-12 rounded-full bg-grape/20 blur-xl"
+          animate={{ y: [0, -25, 0], scale: [1, 1.4, 1] }}
+          transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-10 w-14 h-14 rounded-full bg-ocean/20 blur-xl"
+          animate={{ y: [0, 20, 0], x: [0, -10, 0], scale: [1, 1.2, 1] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
+        />
+        {/* Floating food icons */}
+        <motion.span
+          className="absolute top-20 left-1/4 text-2xl opacity-30"
+          animate={{ y: [0, -30, 0], rotate: [0, 15, -15, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        >🥑</motion.span>
+        <motion.span
+          className="absolute top-40 right-1/4 text-xl opacity-30"
+          animate={{ y: [0, -20, 0], rotate: [0, -10, 10, 0] }}
+          transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+        >🍓</motion.span>
+        <motion.span
+          className="absolute bottom-52 left-1/3 text-lg opacity-30"
+          animate={{ y: [0, -25, 0], rotate: [0, 20, -20, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2.5 }}
+        >🥦</motion.span>
+        <motion.span
+          className="absolute bottom-32 right-1/3 text-2xl opacity-30"
+          animate={{ y: [0, -15, 0], rotate: [0, -15, 15, 0] }}
+          transition={{ duration: 3.5, repeat: Infinity, ease: "easeInOut", delay: 0.8 }}
+        >🍊</motion.span>
+      </div>
+
+      {/* Kawaii character with bounce */}
       <motion.div
-        animate={{ y: [0, -15, 0], rotate: [0, 5, -5, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+        initial={{ scale: 0, rotate: -180 }}
+        animate={{ scale: 1, rotate: 0 }}
+        transition={{ type: "spring", stiffness: 200, damping: 15, delay: 0.2 }}
       >
-        <KawaiiCharacter emotion="excited" size={120} />
+        <motion.div
+          animate={{ y: [0, -15, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <KawaiiCharacter emotion="excited" size={140} />
+        </motion.div>
       </motion.div>
-      <h1 className="mt-8 text-[32px] font-black text-leaf">NourishIQ</h1>
-      <p className="mt-2 text-lg text-gray-500">Your food, your rules.</p>
+
+      {/* Animated NourishIQ Title */}
+      <motion.div
+        className="mt-6 relative"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.8 }}
+      >
+        <motion.h1
+          className="text-[40px] font-black leading-tight tracking-tight"
+          style={{
+            background: "linear-gradient(135deg, #84cc16 0%, #65a30d 25%, #f97316 50%, #a855f7 75%, #0ea5e9 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
+          animate={{
+            backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
+          }}
+          transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+        >
+          NourishIQ
+        </motion.h1>
+
+        {/* Animated underline */}
+        <motion.div
+          className="h-1.5 rounded-full mt-1 mx-auto"
+          style={{
+            background: "linear-gradient(90deg, #84cc16, #f97316, #a855f7)",
+          }}
+          initial={{ width: 0 }}
+          animate={{ width: "80%" }}
+          transition={{ delay: 0.8, duration: 0.6, ease: "easeOut" }}
+        />
+      </motion.div>
+
+      {/* Animated tagline */}
+      <motion.p
+        className="mt-4 text-lg text-gray-500 font-medium"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.6, duration: 0.6 }}
+      >
+        Your food, your rules.
+      </motion.p>
+
+      {/* Animated feature pills */}
+      <motion.div
+        className="mt-6 flex flex-wrap justify-center gap-2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9, duration: 0.5 }}
+      >
+        {["Personalized", "Delicious", "Nutritious"].map((tag, i) => (
+          <motion.span
+            key={tag}
+            className="px-4 py-1.5 rounded-full text-xs font-bold text-white"
+            style={{
+              background: i === 0 ? "linear-gradient(135deg, #84cc16, #65a30d)" :
+                        i === 1 ? "linear-gradient(135deg, #f97316, #ea580c)" :
+                        "linear-gradient(135deg, #a855f7, #7e22ce)",
+            }}
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ delay: 1 + i * 0.15, type: "spring", stiffness: 300 }}
+          >
+            {tag}
+          </motion.span>
+        ))}
+      </motion.div>
+
+      {/* Animated CTA button */}
       <motion.button
-        whileHover={{ scale: 1.05 }}
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 1.3, duration: 0.5 }}
+        whileHover={{ scale: 1.05, boxShadow: "0 8px 30px rgba(132, 204, 22, 0.4)" }}
         whileTap={{ scale: 0.95 }}
         onClick={goNext}
-        className="mt-12 w-full gradient-leaf text-white font-bold py-4 rounded-2xl text-lg shadow-glow"
+        className="mt-10 w-full gradient-leaf text-white font-bold py-4 rounded-2xl text-lg shadow-glow relative overflow-hidden"
       >
-        Let&apos;s go &rarr;
+        <motion.span
+          className="relative z-10"
+          animate={{ x: [0, 5, 0] }}
+          transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+        >
+          Let&apos;s go &rarr;
+        </motion.span>
+        <motion.div
+          className="absolute inset-0 bg-white/20"
+          initial={{ x: "-100%" }}
+          whileHover={{ x: "100%" }}
+          transition={{ duration: 0.5 }}
+        />
       </motion.button>
+
+      {/* Bottom floating particles */}
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center gap-4">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            className="w-2 h-2 rounded-full bg-leaf/40"
+            animate={{ y: [0, -10, 0], opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
+          />
+        ))}
+      </div>
     </div>
   );
 
+  // ==================== REST OF STEPS (unchanged) ====================
   const NameStep = () => (
     <div className="px-6 pt-12">
       <h2 className="text-2xl font-black mb-2">What should we call you?</h2>
@@ -393,11 +544,11 @@ export function OnboardingQuiz() {
       <p className="text-gray-500 mb-6">For cooking each meal.</p>
       <div className="space-y-3">
         {[
-          { id: "under-15", label: "Under 15 mins", icon: "⚡" },
-          { id: "15-30", label: "15-30 mins", icon: "🍳" },
-          { id: "30-60", label: "30-60 mins", icon: "👨‍🍳" },
-          { id: "1-2-hours", label: "1-2 hours", icon: "🕐" },
-          { id: "meal-prep", label: "I meal prep once a week", icon: "📦" },
+          { id: "under-15", label: "Under 15 mins", icon: "Zap" },
+          { id: "15-30", label: "15-30 mins", icon: "Cook" },
+          { id: "30-60", label: "30-60 mins", icon: "Chef" },
+          { id: "1-2-hours", label: "1-2 hours", icon: "Clock" },
+          { id: "meal-prep", label: "I meal prep once a week", icon: "Box" },
         ].map((opt) => (
           <motion.button
             key={opt.id}
@@ -409,7 +560,7 @@ export function OnboardingQuiz() {
                 : "bg-white border-2 border-gray-200 text-gray-700"
             }`}
           >
-            <span className="text-2xl">{opt.icon}</span>
+            <span className="text-2xl font-black text-leaf/80">{opt.icon[0]}</span>
             <span>{opt.label}</span>
           </motion.button>
         ))}
@@ -560,7 +711,7 @@ export function OnboardingQuiz() {
           </div>
           <div>
             <p className="font-black text-lg">{quizState.name}</p>
-            <p className="text-gray-500 text-sm">{quizState.region} • {quizState.dietType[0]}</p>
+            <p className="text-gray-500 text-sm">{quizState.region} &bull; {quizState.dietType[0]}</p>
           </div>
         </div>
         <div className="space-y-2">
@@ -638,7 +789,7 @@ export function OnboardingQuiz() {
           </div>
         </div>
       )}
-      
+
       <div className="flex-1 overflow-y-auto no-scrollbar">
         <AnimatePresence custom={direction} mode="wait">
           <motion.div
@@ -654,7 +805,7 @@ export function OnboardingQuiz() {
           </motion.div>
         </AnimatePresence>
       </div>
-      
+
       {quizStep > 1 && quizStep < 16 && (
         <div className="px-6 pb-8 pt-4 bg-cream">
           <motion.button
