@@ -41,3 +41,9 @@ export interface UserProfile {
   age: number;
   targetCalories: number;
 }
+
+export interface CalorieLog {
+  date: string;
+  consumed: number;
+  target: number;
+}
