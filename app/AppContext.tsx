@@ -85,7 +85,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [currentView, setCurrentView] = useState<"onboarding" | "dashboard">("onboarding");
   const [activeTab, setActiveTab] = useState<TabType>("home");
   const [quizStep, setQuizStep] = useState(1);
-  const totalQuizSteps = 15;
+  const totalQuizSteps = 16;
   const [quizState, setQuizState] = useState<QuizState>(defaultQuizState);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [includeDessert, setIncludeDessert] = useState(false);
@@ -172,57 +172,57 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setUserProfile((prev) => ({ ...prev, ...updates }));
   }, []);
 
+  const value: AppContextType = {
+    currentView,
+    setCurrentView,
+    activeTab,
+    setActiveTab,
+    quizStep,
+    setQuizStep,
+    totalQuizSteps,
+    quizState,
+    updateQuizState,
+    userProfile,
+    selectedDate,
+    setSelectedDate,
+    dayPlan,
+    includeDessert,
+    setIncludeDessert,
+    includeBeverage,
+    setIncludeBeverage,
+    mealsPerDay,
+    setMealsPerDay,
+    toggleLikeMeal,
+    regenerateMealForDay,
+    favorites,
+    selectedMeal,
+    setSelectedMeal,
+    showRecipeSheet,
+    setShowRecipeSheet,
+    showChat,
+    setShowChat,
+    loggedMeals,
+    toggleLoggedMeal,
+    calorieHistory,
+    addCalorieLog,
+    checkinData,
+    updateCheckin,
+    applianceFilter,
+    setApplianceFilter,
+    showApplianceFilter,
+    setShowApplianceFilter,
+    cravingQuery,
+    setCravingQuery,
+    cravingResults,
+    searchCravings,
+    resetApp,
+    showEditProfile,
+    setShowEditProfile,
+    updateProfile,
+  };
+
   return (
-    <AppContext.Provider
-      value={{
-        currentView,
-        setCurrentView,
-        activeTab,
-        setActiveTab,
-        quizStep,
-        setQuizStep,
-        totalQuizSteps,
-        quizState,
-        updateQuizState,
-        userProfile,
-        selectedDate,
-        setSelectedDate,
-        dayPlan,
-        includeDessert,
-        setIncludeDessert,
-        includeBeverage,
-        setIncludeBeverage,
-        mealsPerDay,
-        setMealsPerDay,
-        toggleLikeMeal,
-        regenerateMealForDay,
-        favorites,
-        selectedMeal,
-        setSelectedMeal,
-        showRecipeSheet,
-        setShowRecipeSheet,
-        showChat,
-        setShowChat,
-        loggedMeals,
-        toggleLoggedMeal,
-        calorieHistory,
-        addCalorieLog,
-        checkinData,
-        updateCheckin,
-        applianceFilter,
-        setApplianceFilter,
-        showApplianceFilter,
-        setShowApplianceFilter,
-        cravingQuery,
-        setCravingQuery,
-        cravingResults,
-        searchCravings,
-        resetApp,
-        showEditProfile,
-        setShowEditProfile,
-        updateProfile,
-      }}
-    >
+    <AppContext.Provider value={value}>
       {children}
     </AppContext.Provider>
   );
