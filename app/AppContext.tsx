@@ -1,8 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { TabType, QuizState, Meal, DayPlan, UserProfile, CalorieLog } from "./lib/types";
-import { generateDailyPlan, regenerateMeal, matchCraving, ALL_MEALS } from "./lib/mealData";
+import { TabType, QuizState, UserProfile, CalorieLog } from "./lib/types";
+import { Meal, DayPlan, generateDailyPlan, regenerateMeal, matchCraving, ALL_MEALS } from "./lib/mealData";
 
 interface AppContextType {
   currentView: "onboarding" | "dashboard";
@@ -139,8 +139,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const regenerateMealForDay = useCallback((mealId: string, category: string) => {
     const dateStr = selectedDate.toISOString().split("T")[0];
-    const newMeals = regenerateMeal(dateStr, category, dayPlan.meals);
-    // Update day plan would need state management - simplified here
+    regenerateMeal(dateStr, category, dayPlan.meals);
   }, [selectedDate, dayPlan.meals]);
 
   const toggleLoggedMeal = useCallback((mealId: string) => {
