@@ -2,7 +2,7 @@
 
 import { useApp } from "../AppContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { Heart, X, Volume2, VolumeX, Play, Pause, ChefHat, Clock, Flame, Users, ShoppingBag, AlertCircle } from "lucide-react";
+import { Heart, X, Volume2, VolumeX, Play, Pause, ChefHat, Clock, Flame, Users, ShoppingBag, AlertCircle, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 
 export function RecipeSheet() {
@@ -12,7 +12,6 @@ export function RecipeSheet() {
     showRecipeSheet,
     toggleLikeMeal,
     regenerateMealForDay,
-    selectedDate,
   } = useApp();
 
   const [speakingStep, setSpeakingStep] = useState<number | null>(null);
@@ -21,7 +20,7 @@ export function RecipeSheet() {
 
   useEffect(() => {
     return () => {
-      if (window.speechSynthesis) {
+      if (typeof window !== "undefined" && window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
     };
@@ -30,7 +29,7 @@ export function RecipeSheet() {
   if (!selectedMeal || !showRecipeSheet) return null;
 
   const speakStep = (stepIndex: number) => {
-    if (!window.speechSynthesis) return;
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
 
     window.speechSynthesis.cancel();
 
@@ -59,7 +58,9 @@ export function RecipeSheet() {
   };
 
   const stopSpeaking = () => {
-    window.speechSynthesis.cancel();
+    if (typeof window !== "undefined" && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
     setSpeakingStep(null);
   };
 
@@ -73,7 +74,7 @@ export function RecipeSheet() {
   };
 
   const speakAllSteps = () => {
-    if (!window.speechSynthesis) return;
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
 
     const allText = selectedMeal.steps.map(s => `Step ${s.step}: ${s.text}. Time: ${s.time}.`).join(" Next. ");
