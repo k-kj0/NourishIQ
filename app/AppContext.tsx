@@ -51,6 +51,8 @@ interface AppContextType {
   showEditProfile: boolean;
   setShowEditProfile: (val: boolean) => void;
   updateProfile: (updates: Partial<UserProfile>) => void;
+  showCravingInput: boolean;
+  setShowCravingInput: (val: boolean) => void;
 }
 
 const defaultQuizState: QuizState = {
@@ -103,6 +105,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [cravingQuery, setCravingQuery] = useState("");
   const [cravingResults, setCravingResults] = useState<Meal[]>([]);
   const [showEditProfile, setShowEditProfile] = useState(false);
+  const [showCravingInput, setShowCravingInput] = useState(false);
 
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: "",
@@ -219,6 +222,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     showEditProfile,
     setShowEditProfile,
     updateProfile,
+    showCravingInput,
+    setShowCravingInput,
   };
 
   return (
