@@ -1,51 +1,92 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Home, Search, Heart, User } from "lucide-react";
 import { useApp } from "../AppContext";
-import { TabType } from "../lib/types";
+import { Home, Search, Heart, User } from "lucide-react";
+import { KawaiiCharacter } from "./KawaiiCharacter";
 
 export function BottomNav() {
   const { activeTab, setActiveTab } = useApp();
 
-  const tabs: { id: TabType; label: string; icon: React.ReactNode }[] = [
-    { id: "home", label: "Home", icon: <Home className="w-6 h-6" /> },
-    { id: "explore", label: "Explore", icon: <Search className="w-6 h-6" /> },
-    { id: "favorites", label: "Favs", icon: <Heart className="w-6 h-6" /> },
-    { id: "profile", label: "Me", icon: <User className="w-6 h-6" /> },
+  const tabs = [
+    { id: "home", label: "Home", icon: Home, color: "text-green-500" },
+    { id: "explore", label: "Explore", icon: Search, color: "text-orange-500" },
+    { id: "favorites", label: "Favs", icon: Heart, color: "text-red-500" },
+    { id: "profile", label: "Me", icon: User, color: "text-purple-500" },
   ];
 
   return (
-    <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[460px] bg-white/95 backdrop-blur border-t border-gray-200 px-3 pt-2 pb-5 z-50">
-      <div className="flex items-center justify-around">
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.id;
-          return (
-            <motion.button
-              key={tab.id}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setActiveTab(tab.id)}
-              className="relative flex flex-1 flex-col items-center gap-1 py-1"
-            >
-              <motion.div
-                animate={isActive ? { y: [0, -4, 0] } : { y: 0 }}
-                transition={{ duration: 0.4 }}
-                className={isActive ? "text-leaf" : "text-gray-400"}
-              >
-                {tab.icon}
-              </motion.div>
-              <span className={`text-[10px] font-bold ${isActive ? "text-leaf" : "text-gray-400"}`}>
-                {tab.label}
-              </span>
-              {isActive && (
-                <motion.div
-                  layoutId="nav-dot"
-                  className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-leaf"
-                />
-              )}
-            </motion.button>
-          );
-        })}
+    <div className="fixed bottom-0 left-0 right-0 z-40 flex justify-center">
+      <div className="w-full max-w-[460px] relative">
+        {/* Floating Kawaii character above nav */}
+        <motion.div
+          className="absolute -top-8 left-1/2 -translate-x-1/2 z-50"
+          animate={{ y: [0, -5, 0] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+        >
+          <KawaiiCharacter emotion="happy" size={45} />
+        </motion.div>
+
+        {/* Nav bar */}
+        <div className="bg-white/90 backdrop-blur-xl border-t border-gray-100 px-6 py-2 pb-6 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+          <div className="flex items-center justify-around">
+            {tabs.map((tab) => {
+              const isActive = activeTab === tab.id;
+              const Icon = tab.icon;
+
+              return (
+                <motion.button
+                  key={tab.id}
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setActiveTab(tab.id as any)}
+                  className="relative flex flex-col items-center gap-1 py-2 px-4"
+                >
+                  {/* Active indicator */}
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeTab"
+                      className="absolute -top-2 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full bg-gradient-to-r from-green-400 to-emerald-500"
+                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                    />
+                  )}
+
+                  <motion.div
+                    animate={isActive ? { scale: [1, 1.15, 1] } : {}}
+                    transition={{ duration: 0.5 }}
+                  >
+                    <Icon 
+                      className={`w-6 h-6 transition-colors ${
+                        isActive ? tab.color : "text-gray-300"
+                      }`} 
+                      strokeWidth={isActive ? 2.5 : 1.5}
+                    />
+                  </motion.div>
+
+                  <span className={`text-[10px] font-bold transition-colors ${
+                    isActive ? tab.color : "text-gray-300"
+                  }`}>
+                    {tab.label}
+                  </span>
+
+                  {/* Active dot */}
+                  {isActive && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className={`w-1.5 h-1.5 rounded-full ${
+                        tab.id === "home" ? "bg-green-400" :
+                        tab.id === "explore" ? "bg-orange-400" :
+                        tab.id === "favorites" ? "bg-red-400" :
+                        "bg-purple-400"
+                      }`}
+                    />
+                  )}
+                </motion.button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
