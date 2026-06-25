@@ -6,16 +6,16 @@ import { X, Heart, Clock, Users, Flame, Plus } from "lucide-react";
 
 export function RecipeSheet() {
   const { selectedMeal, showRecipeSheet, setShowRecipeSheet, toggleLikeMeal, favorites } = useApp();
-  const [activeTab, setActiveTab] = useState("ingredients");
-  const [checkedIngredients, setCheckedIngredients] = useState(new Set());
-  const [completedSteps, setCompletedSteps] = useState(new Set());
+  const [activeTab, setActiveTab] = useState<string>("ingredients");
+  const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
+  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
 
   if (!selectedMeal || !showRecipeSheet) return null;
 
   const isLiked = favorites.some((m) => m.id === selectedMeal.id);
 
-  const toggleIngredient = (index) => {
-    setCheckedIngredients((prev) => {
+  const toggleIngredient = (index: number) => {
+    setCheckedIngredients((prev: Set<number>) => {
       const next = new Set(prev);
       if (next.has(index)) next.delete(index);
       else next.add(index);
@@ -23,8 +23,8 @@ export function RecipeSheet() {
     });
   };
 
-  const toggleStep = (stepNum) => {
-    setCompletedSteps((prev) => {
+  const toggleStep = (stepNum: number) => {
+    setCompletedSteps((prev: Set<number>) => {
       const next = new Set(prev);
       if (next.has(stepNum)) next.delete(stepNum);
       else next.add(stepNum);
@@ -32,37 +32,37 @@ export function RecipeSheet() {
     });
   };
 
-  const getImgUrl = (name) => {
+  const getImgUrl = (name: string) => {
     return "https://placehold.co/800x400/22c55e/ffffff?text=" + encodeURIComponent(name);
   };
 
-  const getClass = (isChecked) => {
+  const getClass = (isChecked: boolean) => {
     return isChecked
       ? "flex items-center justify-between p-3 rounded-2xl mb-2 cursor-pointer transition-all bg-green-50 border-2 border-green-200"
       : "flex items-center justify-between p-3 rounded-2xl mb-2 cursor-pointer transition-all bg-gray-50 border-2 border-transparent";
   };
 
-  const getTextClass = (isChecked) => {
+  const getTextClass = (isChecked: boolean) => {
     return isChecked ? "text-sm font-medium text-gray-400 line-through" : "text-sm font-medium text-gray-800";
   };
 
-  const getCircleClass = (isChecked) => {
+  const getCircleClass = (isChecked: boolean) => {
     return isChecked
       ? "w-5 h-5 rounded-full border-2 flex items-center justify-center bg-green-500 border-green-500"
       : "w-5 h-5 rounded-full border-2 flex items-center justify-center border-gray-300";
   };
 
-  const getStepCircleClass = (isDone) => {
+  const getStepCircleClass = (isDone: boolean) => {
     return isDone
       ? "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all bg-green-500 text-white"
       : "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all bg-green-100 text-green-700";
   };
 
-  const getStepTextClass = (isDone) => {
+  const getStepTextClass = (isDone: boolean) => {
     return isDone ? "text-sm font-bold text-gray-400 line-through" : "text-sm font-bold text-gray-800";
   };
 
-  const getStepDescClass = (isDone) => {
+  const getStepDescClass = (isDone: boolean) => {
     return isDone ? "text-sm leading-relaxed text-gray-400 line-through" : "text-sm leading-relaxed text-gray-600";
   };
 
@@ -76,7 +76,7 @@ export function RecipeSheet() {
             src={selectedMeal.image}
             alt={selectedMeal.name}
             className="w-full h-56 object-cover rounded-t-[2rem]"
-            onError={(e) => { (e.target).src = getImgUrl(selectedMeal.name); }}
+            onError={(e) => { (e.target as HTMLImageElement).src = getImgUrl(selectedMeal.name); }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-t-[2rem]" />
           
@@ -115,7 +115,7 @@ export function RecipeSheet() {
           </div>
 
           <div className="flex gap-1 bg-gray-100 rounded-2xl p-1 mb-5">
-            {tabs.map((tab) => (
+            {tabs.map((tab: string) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
@@ -135,7 +135,7 @@ export function RecipeSheet() {
               <p className="text-sm font-semibold text-gray-700 mb-3">
                 For {selectedMeal.servings} {selectedMeal.servings === 1 ? "serving" : "servings"}
               </p>
-              {selectedMeal.ingredients.map((ing, i) => {
+              {selectedMeal.ingredients.map((ing: string, i: number) => {
                 const parts = ing.split("(");
                 const name = parts[0].trim();
                 const amount = parts[1] ? parts[1].replace(")", "").trim() : "";
@@ -193,7 +193,7 @@ export function RecipeSheet() {
 
           {activeTab === "steps" && (
             <div className="space-y-4">
-              {selectedMeal.steps.map((step, i) => {
+              {selectedMeal.steps.map((step, i: number) => {
                 const isDone = completedSteps.has(step.step);
                 const textParts = step.text.split(". ");
                 const firstPart = textParts[0];
@@ -238,7 +238,7 @@ export function RecipeSheet() {
 
           {activeTab === "substitutes" && (
             <div className="space-y-3">
-              {selectedMeal.substitutes.map((sub, i) => (
+              {selectedMeal.substitutes.map((sub, i: number) => (
                 <div key={i} className="bg-amber-50 rounded-2xl p-4">
                   <p className="text-sm font-bold text-amber-800 mb-1">No {sub.ingredient}?</p>
                   <p className="text-sm text-amber-700">Try: {sub.alternatives.join(", ")}</p>
@@ -246,7 +246,7 @@ export function RecipeSheet() {
               ))}
               <div className="mt-4">
                 <h4 className="text-sm font-bold text-gray-700 mb-2">Health Benefits</h4>
-                {selectedMeal.benefits.map((b, i) => (
+                {selectedMeal.benefits.map((b: string, i: number) => (
                   <p key={i} className="text-sm text-gray-600 flex items-start gap-2 mb-2">
                     <span className="text-green-500 mt-0.5">&#8226;</span> {b}
                   </p>
