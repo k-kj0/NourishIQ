@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useApp } from "../AppContext";
-import { X, Heart, Clock, Users, Flame, ChevronRight, Plus } from "lucide-react";
+import { X, Heart, Clock, Users, Flame, Plus } from "lucide-react";
 
 export function RecipeSheet() {
   const { selectedMeal, showRecipeSheet, setShowRecipeSheet, toggleLikeMeal, favorites } = useApp();
@@ -46,8 +46,7 @@ export function RecipeSheet() {
             }}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-t-[2rem]" />
-
-          {/* Close button */}
+          
           <button
             onClick={() => setShowRecipeSheet(false)}
             className="absolute top-4 right-4 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-lg"
@@ -60,13 +59,13 @@ export function RecipeSheet() {
         <div className="px-5 pt-4 pb-8">
           {/* Category & Title */}
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-green-500 text-xs">✦</span>
+            <span className="text-green-500 text-xs">&#10022;</span>
             <span className="text-xs font-bold text-green-600 uppercase tracking-wider">{selectedMeal.category}</span>
           </div>
 
           <h2 className="text-2xl font-bold text-gray-900 mb-2">{selectedMeal.name}</h2>
           <p className="text-sm text-gray-500 mb-4 leading-relaxed">
-            {selectedMeal.description || `A hearty and protein-packed dish with fresh ingredients and bold flavors.`}
+            A hearty and protein-packed dish with fresh ingredients and bold flavors.
           </p>
 
           {/* Meta info */}
@@ -112,7 +111,7 @@ export function RecipeSheet() {
                 const parts = ing.split("(");
                 const name = parts[0].trim();
                 const amount = parts[1] ? parts[1].replace(")", "").trim() : "";
-
+                
                 return (
                   <div
                     key={i}
@@ -195,9 +194,9 @@ export function RecipeSheet() {
                     )}
                   </button>
                   <div className="flex-1">
-                    <h4 className={`text-sm font-bold mb-1 ${completedSteps.has(step.step) ? "text-gray-400 line-through" : "text-gray-800"}`}>
+                    <p className={`text-sm font-bold mb-1 ${completedSteps.has(step.step) ? "text-gray-400 line-through" : "text-gray-800"}`}>
                       {step.text.split(". ")[0]}
-                    </h4>
+                    </p>
                     <p className={`text-sm leading-relaxed ${completedSteps.has(step.step) ? "text-gray-400 line-through" : "text-gray-600"}`}>
                       {step.text.includes(". ") ? step.text.split(". ").slice(1).join(". ") : step.text}
                     </p>
@@ -234,7 +233,7 @@ export function RecipeSheet() {
                 <h4 className="text-sm font-bold text-gray-700 mb-2">Health Benefits</h4>
                 {selectedMeal.benefits.map((b, i) => (
                   <p key={i} className="text-sm text-gray-600 flex items-start gap-2 mb-2">
-                    <span className="text-green-500 mt-0.5">•</span> {b}
+                    <span className="text-green-500 mt-0.5">&#8226;</span> {b}
                   </p>
                 ))}
               </div>
@@ -250,4 +249,5 @@ export function RecipeSheet() {
       </div>
     </div>
   );
+}
 }
