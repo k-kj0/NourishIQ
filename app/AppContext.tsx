@@ -1,293 +1,275 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, ReactNode } from "react";
-import { TabType, QuizState, UserProfile, CalorieLog } from "./lib/types";
-import { Meal, DayPlan, generateDailyPlan, regenerateMeal, matchCraving } from "./lib/mealData";
+import React, { createContext, useContext, useState, ReactNode } from "react";
 
-export interface AppContextType {
-  currentView: "onboarding" | "dashboard";
-  setCurrentView: (view: "onboarding" | "dashboard") => void;
-  activeTab: TabType;
-  setActiveTab: (tab: TabType) => void;
-  quizStep: number;
-  setQuizStep: (step: number) => void;
-  totalQuizSteps: number;
-  quizState: QuizState;
-  updateQuizState: (updates: Partial<QuizState>) => void;
-  userProfile: UserProfile;
-  setUserProfile: (profile: UserProfile) => void;
-  selectedDate: Date;
-  setSelectedDate: (date: Date) => void;
-  includeDessert: boolean;
-  setIncludeDessert: (val: boolean) => void;
-  includeBeverage: boolean;
-  setIncludeBeverage: (val: boolean) => void;
-  mealsPerDay: number;
-  setMealsPerDay: (val: number) => void;
-  dayPlan: DayPlan;
-  dailyPlan: DayPlan;
-  setDailyPlan: (plan: DayPlan) => void;
-  regenerateMealForSlot: (slot: string) => void;
-  regenerateMealForDay: (mealId: string, category: string) => void;
+export type Meal = {
+  id: string;
+  name: string;
+  category: string;
+  image: string;
+  cookTime: string;
+  servings: number;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  ingredients: string[];
+  steps: { step: number; text: string; time: string }[];
+  substitutes: { ingredient: string; alternatives: string[] }[];
+  benefits: string[];
+};
+
+export type UserProfile = {
+  name: string;
+  gender: string;
+  diet: string[];
+  healthConditions: string[];
+  cookingTime: string;
+  kitchenSetup: string[];
+  lovedFoods: string[];
+};
+
+type AppContextType = {
+  phase: "onboarding" | "dashboard";
+  setPhase: (p: "onboarding" | "dashboard") => void;
+  profile: UserProfile;
+  setProfile: (p: UserProfile) => void;
   selectedMeal: Meal | null;
-  setSelectedMeal: (meal: Meal | null) => void;
-  showRecipe: boolean;
-  setShowRecipe: (show: boolean) => void;
+  setSelectedMeal: (m: Meal | null) => void;
   showRecipeSheet: boolean;
-  setShowRecipeSheet: (show: boolean) => void;
-  showChat: boolean;
-  setShowChat: (val: boolean) => void;
+  setShowRecipeSheet: (v: boolean) => void;
   favorites: Meal[];
-  setFavorites: (meals: Meal[]) => void;
-  toggleFavorite: (meal: Meal) => void;
-  toggleLikeMeal: (mealId: string) => void;
-  loggedMeals: Record<string, boolean>;
-  toggleLoggedMeal: (mealId: string) => void;
-  calorieLog: CalorieLog[];
-  calorieHistory: CalorieLog[];
-  setCalorieLog: (logs: CalorieLog[]) => void;
-  logCalories: (date: string, consumed: number, target: number) => void;
-  addCalorieLog: (log: CalorieLog) => void;
-  showCravingInput: boolean;
-  setShowCravingInput: (show: boolean) => void;
-  cravingQuery: string;
-  setCravingQuery: (val: string) => void;
-  cravingResults: Meal[];
-  setCravingResults: (results: Meal[]) => void;
-  searchCraving: (query: string) => void;
-  searchCravings: (query: string) => void;
-  showApplianceFilter: boolean;
-  setShowApplianceFilter: (val: boolean) => void;
-  applianceFilter: string | null;
-  setApplianceFilter: (val: string | null) => void;
-  checkinData: Record<string, string>;
-  updateCheckin: (type: string, value: string) => void;
-  resetApp: () => void;
-  showEditProfile: boolean;
-  setShowEditProfile: (val: boolean) => void;
-  updateProfile: (updates: Partial<UserProfile>) => void;
-}
-
-const defaultQuizState: QuizState = {
-  name: "",
-  age: null,
-  gender: "",
-  region: "",
-  dietType: [],
-  healthGoals: [],
-  healthConditions: [],
-  hasMenstrualCycle: "",
-  wantMenstrualMeals: false,
-  menstrualPhase: "",
-  lovedFoods: [],
-  avoidedFoods: [],
-  avoidedTextures: [],
-  avoidedFlavors: [],
-  customAvoidances: [],
-  cookingTime: "",
-  mealTimes: { breakfast: "08:00", lunch: "13:00", snack: "16:00", dinner: "20:00" },
-  snacksPerDay: 1,
-  mealsPerDay: 3,
-  currentWeight: null,
-  targetWeight: null,
-  weightUnit: "kg",
-  appliances: [],
-  breakfastVarieties: 3,
-  lunchVarieties: 3,
-  dinnerVarieties: 3,
-  snackVarieties: 3,
-  lunchboxVarieties: 0,
+  toggleLikeMeal: (m: Meal) => void;
+  activeTab: string;
+  setActiveTab: (t: string) => void;
 };
 
-const defaultUserProfile: UserProfile = {
-  name: "",
-  initials: "",
-  goal: "",
-  diet: "",
-  region: "",
-  gender: "",
-  age: 0,
-  targetCalories: 2000,
-};
+const AppContext = createContext<AppContextType | null>(null);
 
-const AppContext = createContext<AppContextType | undefined>(undefined);
+export const MEALS: Meal[] = [
+  {
+    id: "shakshuka",
+    name: "Shakshuka with Feta",
+    category: "BREAKFAST",
+    image: "https://images.unsplash.com/photo-1700070432484-a4e7c0d72d79?w=800&q=80",
+    cookTime: "25 min",
+    servings: 2,
+    calories: 352,
+    protein: 22,
+    carbs: 36,
+    fat: 22,
+    ingredients: [
+      "Olive Oil (1 tbsp)",
+      "Onion, chopped (1 medium)",
+      "Garlic, minced (2 cloves)",
+      "Red Bell Pepper (1 medium)",
+      "Canned Crushed Tomatoes (1 cup)",
+      "Tomato Paste (1 tbsp)",
+      "Cumin Powder (1/2 tsp)",
+      "Paprika (1/2 tsp)",
+      "Chili Flakes (1/2 tsp)",
+      "Salt (to taste)",
+      "Black Pepper (to taste)",
+      "Eggs (2)",
+      "Feta Cheese (1/4 cup)",
+      "Fresh Parsley or Cilantro (for garnish)",
+    ],
+    steps: [
+      { step: 1, text: "Sauté Aromatics. Heat olive oil in a skillet over medium heat. Add chopped onions and sauté until soft (about 3–4 mins). Add garlic and cook for another 30 seconds.", time: "4 min" },
+      { step: 2, text: "Add Vegetables. Add chopped red bell pepper and cook for 4–5 minutes until slightly softened.", time: "5 min" },
+      { step: 3, text: "Build the Sauce. Add crushed tomatoes, tomato paste, cumin, paprika, chili flakes, salt, and pepper. Stir well and let it simmer for 8–10 minutes.", time: "10 min" },
+      { step: 4, text: "Create Wells & Add Eggs. Make 2 small wells in the sauce. Crack an egg into each well. Cover and cook for 5–7 minutes until eggs are set to your liking.", time: "7 min" },
+      { step: 5, text: "Add Feta & Garnish. Sprinkle crumbled feta over the top. Cover for 1–2 minutes until warm. Garnish with fresh parsley or cilantro.", time: "2 min" },
+      { step: 6, text: "Serve & Enjoy. Serve hot with whole grain toast, pita, or a side salad.", time: "" },
+    ],
+    substitutes: [
+      { ingredient: "Feta Cheese", alternatives: ["Goat Cheese", "Ricotta", "Paneer"] },
+      { ingredient: "Eggs", alternatives: ["Tofu Scramble (vegan)", "Chickpeas"] },
+      { ingredient: "Canned Tomatoes", alternatives: ["Fresh tomatoes", "Passata"] },
+    ],
+    benefits: [
+      "High in lycopene from tomatoes — supports heart health",
+      "Eggs provide complete protein and essential B vitamins",
+      "Bell peppers are rich in Vitamin C and antioxidants",
+    ],
+  },
+  {
+    id: "lemon-herb-chicken",
+    name: "Lemon Herb Chicken Bowl",
+    category: "LUNCH",
+    image: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&q=80",
+    cookTime: "30 min",
+    servings: 2,
+    calories: 480,
+    protein: 34,
+    carbs: 42,
+    fat: 12,
+    ingredients: [
+      "Chicken Breast (200g)",
+      "Lemon Juice (2 tbsp)",
+      "Olive Oil (1 tbsp)",
+      "Garlic, minced (2 cloves)",
+      "Fresh Thyme (1 tsp)",
+      "Fresh Rosemary (1 tsp)",
+      "Brown Rice, cooked (1 cup)",
+      "Mixed Greens (1 cup)",
+      "Cherry Tomatoes (1/2 cup)",
+      "Cucumber, sliced (1/2)",
+      "Salt & Pepper (to taste)",
+    ],
+    steps: [
+      { step: 1, text: "Marinate Chicken. Mix lemon juice, olive oil, garlic, thyme, rosemary, salt and pepper. Coat chicken and marinate for 15 mins.", time: "15 min" },
+      { step: 2, text: "Cook Chicken. Grill or pan-fry chicken for 6–7 mins per side until cooked through. Rest for 5 minutes then slice.", time: "15 min" },
+      { step: 3, text: "Assemble Bowl. Add rice as the base, top with greens, tomatoes, and cucumber.", time: "3 min" },
+      { step: 4, text: "Top & Serve. Lay sliced chicken on top. Drizzle with extra lemon juice and olive oil.", time: "2 min" },
+    ],
+    substitutes: [
+      { ingredient: "Chicken Breast", alternatives: ["Turkey breast", "Tofu", "Paneer"] },
+      { ingredient: "Brown Rice", alternatives: ["Quinoa", "Cauliflower rice", "Couscous"] },
+    ],
+    benefits: [
+      "High-protein meal supports muscle repair and satiety",
+      "Lemon is rich in Vitamin C and aids iron absorption",
+      "Mixed greens provide folate and fiber",
+    ],
+  },
+  {
+    id: "grilled-salmon",
+    name: "Grilled Salmon & Veggies",
+    category: "DINNER",
+    image: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=800&q=80",
+    cookTime: "25 min",
+    servings: 2,
+    calories: 520,
+    protein: 38,
+    carbs: 26,
+    fat: 28,
+    ingredients: [
+      "Salmon Fillet (200g)",
+      "Olive Oil (2 tbsp)",
+      "Lemon (1)",
+      "Garlic, minced (2 cloves)",
+      "Asparagus (1 bunch)",
+      "Zucchini, sliced (1)",
+      "Bell Peppers, mixed (1 cup)",
+      "Fresh Dill (2 tbsp)",
+      "Salt & Pepper (to taste)",
+    ],
+    steps: [
+      { step: 1, text: "Prep. Preheat grill to medium-high. Brush salmon and veggies with olive oil, garlic, salt, and pepper.", time: "5 min" },
+      { step: 2, text: "Grill Veggies. Grill asparagus, zucchini, and peppers for 4–5 mins turning once.", time: "5 min" },
+      { step: 3, text: "Grill Salmon. Place salmon skin-side down. Grill 4–5 mins per side until flaky.", time: "10 min" },
+      { step: 4, text: "Finish. Squeeze lemon over everything, garnish with fresh dill and serve.", time: "2 min" },
+    ],
+    substitutes: [
+      { ingredient: "Salmon", alternatives: ["Trout", "Sea bass", "Tofu steaks (vegan)"] },
+      { ingredient: "Asparagus", alternatives: ["Green beans", "Broccoli", "Bok choy"] },
+    ],
+    benefits: [
+      "Salmon is one of the best sources of Omega-3 fatty acids",
+      "Supports brain health, reduces inflammation",
+      "Asparagus is high in folate and prebiotic fiber",
+    ],
+  },
+  {
+    id: "greek-yogurt-berries",
+    name: "Greek Yogurt & Berries",
+    category: "SNACK",
+    image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=800&q=80",
+    cookTime: "5 min",
+    servings: 1,
+    calories: 180,
+    protein: 10,
+    carbs: 16,
+    fat: 6,
+    ingredients: [
+      "Greek Yogurt (1 cup)",
+      "Mixed Berries (1/2 cup)",
+      "Honey (1 tsp)",
+      "Granola (2 tbsp)",
+      "Chia Seeds (1 tsp)",
+    ],
+    steps: [
+      { step: 1, text: "Layer. Add Greek yogurt to a bowl or jar.", time: "1 min" },
+      { step: 2, text: "Top. Add mixed berries, granola, chia seeds, and drizzle with honey.", time: "2 min" },
+      { step: 3, text: "Serve immediately or refrigerate for up to 2 hours.", time: "" },
+    ],
+    substitutes: [
+      { ingredient: "Greek Yogurt", alternatives: ["Coconut yogurt", "Skyr", "Regular yogurt"] },
+      { ingredient: "Honey", alternatives: ["Maple syrup", "Agave nectar", "Date syrup"] },
+    ],
+    benefits: [
+      "Greek yogurt is rich in probiotics supporting gut health",
+      "Berries are antioxidant-rich and anti-inflammatory",
+      "Chia seeds provide Omega-3 and fiber",
+    ],
+  },
+  {
+    id: "lemon-mint-water",
+    name: "Lemon Mint Water",
+    category: "BEVERAGE",
+    image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&q=80",
+    cookTime: "2 min",
+    servings: 2,
+    calories: 10,
+    protein: 0,
+    carbs: 3,
+    fat: 0,
+    ingredients: [
+      "Water (500ml)",
+      "Lemon, sliced (1/2)",
+      "Fresh Mint Leaves (6-8)",
+      "Ice Cubes (as needed)",
+    ],
+    steps: [
+      { step: 1, text: "Combine. Add lemon slices and mint leaves to a pitcher.", time: "1 min" },
+      { step: 2, text: "Pour water over and add ice. Let infuse for 5 minutes before serving.", time: "5 min" },
+    ],
+    substitutes: [
+      { ingredient: "Lemon", alternatives: ["Lime", "Orange", "Cucumber"] },
+      { ingredient: "Mint", alternatives: ["Basil", "Rosemary", "Ginger"] },
+    ],
+    benefits: [
+      "Hydrating and refreshing, supports digestion",
+      "Lemon adds Vitamin C and aids detoxification",
+      "Mint soothes the digestive system",
+    ],
+  },
+];
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [currentView, setCurrentView] = useState<"onboarding" | "dashboard">("onboarding");
-  const [activeTab, setActiveTab] = useState<TabType>("home");
-  const [quizStep, setQuizStep] = useState(1);
-  const totalQuizSteps = 16;
-  const [quizState, setQuizState] = useState<QuizState>(defaultQuizState);
-  const [userProfile, setUserProfile] = useState<UserProfile>(defaultUserProfile);
-  const [selectedDate, setSelectedDate] = useState(new Date());
-  const [includeDessert, setIncludeDessert] = useState(false);
-  const [includeBeverage, setIncludeBeverage] = useState(false);
-  const [mealsPerDay, setMealsPerDay] = useState(3);
-  const [dailyPlan, setDailyPlan] = useState<DayPlan>(generateDailyPlan("2024-01-01", false, false, 3));
+  const [phase, setPhase] = useState<"onboarding" | "dashboard">("onboarding");
+  const [profile, setProfile] = useState<UserProfile>({
+    name: "",
+    gender: "",
+    diet: [],
+    healthConditions: [],
+    cookingTime: "",
+    kitchenSetup: [],
+    lovedFoods: [],
+  });
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
-  const [showRecipe, setShowRecipe] = useState(false);
-  const [showChat, setShowChat] = useState(false);
+  const [showRecipeSheet, setShowRecipeSheet] = useState(false);
   const [favorites, setFavorites] = useState<Meal[]>([]);
-  const [loggedMeals, setLoggedMeals] = useState<Record<string, boolean>>({});
-  const [calorieLog, setCalorieLog] = useState<CalorieLog[]>([]);
-  const [showCravingInput, setShowCravingInput] = useState(false);
-  const [cravingQuery, setCravingQuery] = useState("");
-  const [cravingResults, setCravingResults] = useState<Meal[]>([]);
-  const [showApplianceFilter, setShowApplianceFilter] = useState(false);
-  const [applianceFilter, setApplianceFilter] = useState<string | null>(null);
-  const [checkinData, setCheckinData] = useState<Record<string, string>>({});
-  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [activeTab, setActiveTab] = useState("Home");
 
-  const dayPlan = generateDailyPlan(
-    selectedDate.toISOString().split("T")[0],
-    includeDessert,
-    includeBeverage,
-    mealsPerDay
-  );
-
-  const updateQuizState = useCallback((updates: Partial<QuizState>) => {
-    setQuizState((prev) => ({ ...prev, ...updates }));
-  }, []);
-
-  const regenerateMealForSlot = useCallback((slot: string) => {
-    setDailyPlan((prev) => {
-      const newMeals = regenerateMeal(prev.date, slot, prev.meals);
-      return { ...prev, meals: newMeals };
-    });
-  }, []);
-
-  const regenerateMealForDay = useCallback((mealId: string, category: string) => {
-    setDailyPlan((prev) => {
-      const newMeals = regenerateMeal(prev.date, category, prev.meals);
-      return { ...prev, meals: newMeals };
-    });
-  }, []);
-
-  const toggleFavorite = useCallback((meal: Meal) => {
-    setFavorites((prev) => {
-      const exists = prev.find((m) => m.id === meal.id);
-      if (exists) return prev.filter((m) => m.id !== meal.id);
-      return [...prev, meal];
-    });
-  }, []);
-
-  const toggleLikeMeal = useCallback((mealId: string) => {
-    setFavorites((prev) => {
-      const exists = prev.find((m) => m.id === mealId);
-      if (exists) return prev.filter((m) => m.id !== mealId);
-      const meal = dayPlan.meals.find((m) => m.id === mealId);
-      if (meal) return [...prev, meal];
-      return prev;
-    });
-  }, [dayPlan.meals]);
-
-  const toggleLoggedMeal = useCallback((mealId: string) => {
-    setLoggedMeals((prev) => ({ ...prev, [mealId]: !prev[mealId] }));
-  }, []);
-
-  const logCalories = useCallback((date: string, consumed: number, target: number) => {
-    setCalorieLog((prev) => {
-      const filtered = prev.filter((log) => log.date !== date);
-      return [...filtered, { date, consumed, target }];
-    });
-  }, []);
-
-  const addCalorieLog = useCallback((log: CalorieLog) => {
-    setCalorieLog((prev) => [...prev, log]);
-  }, []);
-
-  const searchCraving = useCallback((query: string) => {
-    const results = matchCraving(query, quizState.avoidedFoods, quizState.appliances);
-    setCravingResults(results);
-  }, [quizState.avoidedFoods, quizState.appliances]);
-
-  const searchCravings = useCallback((query: string) => {
-    const results = matchCraving(query, [], applianceFilter ? [applianceFilter] : []);
-    setCravingResults(results);
-  }, [applianceFilter]);
-
-  const updateCheckin = useCallback((type: string, value: string) => {
-    setCheckinData((prev) => ({ ...prev, [type]: value }));
-  }, []);
-
-  const resetApp = useCallback(() => {
-    setCurrentView("onboarding");
-    setQuizStep(1);
-    setQuizState(defaultQuizState);
-    setFavorites([]);
-    setCalorieLog([]);
-    setCheckinData({});
-    setLoggedMeals({});
-  }, []);
-
-  const updateProfile = useCallback((updates: Partial<UserProfile>) => {
-    setUserProfile((prev) => ({ ...prev, ...updates }));
-  }, []);
+  const toggleLikeMeal = (meal: Meal) => {
+    setFavorites((prev) =>
+      prev.some((m) => m.id === meal.id)
+        ? prev.filter((m) => m.id !== meal.id)
+        : [...prev, meal]
+    );
+  };
 
   return (
     <AppContext.Provider
       value={{
-        currentView,
-        setCurrentView,
-        activeTab,
-        setActiveTab,
-        quizStep,
-        setQuizStep,
-        totalQuizSteps,
-        quizState,
-        updateQuizState,
-        userProfile,
-        setUserProfile,
-        selectedDate,
-        setSelectedDate,
-        includeDessert,
-        setIncludeDessert,
-        includeBeverage,
-        setIncludeBeverage,
-        mealsPerDay,
-        setMealsPerDay,
-        dayPlan,
-        dailyPlan,
-        setDailyPlan,
-        regenerateMealForSlot,
-        regenerateMealForDay,
-        selectedMeal,
-        setSelectedMeal,
-        showRecipe,
-        setShowRecipe,
-        showRecipeSheet: showRecipe,
-        setShowRecipeSheet: setShowRecipe,
-        showChat,
-        setShowChat,
-        favorites,
-        setFavorites,
-        toggleFavorite,
-        toggleLikeMeal,
-        loggedMeals,
-        toggleLoggedMeal,
-        calorieLog,
-        calorieHistory: calorieLog,
-        setCalorieLog,
-        logCalories,
-        addCalorieLog,
-        showCravingInput,
-        setShowCravingInput,
-        cravingQuery,
-        setCravingQuery,
-        cravingResults,
-        setCravingResults,
-        searchCraving,
-        searchCravings,
-        showApplianceFilter,
-        setShowApplianceFilter,
-        applianceFilter,
-        setApplianceFilter,
-        checkinData,
-        updateCheckin,
-        resetApp,
-        showEditProfile,
-        setShowEditProfile,
-        updateProfile,
+        phase, setPhase,
+        profile, setProfile,
+        selectedMeal, setSelectedMeal,
+        showRecipeSheet, setShowRecipeSheet,
+        favorites, toggleLikeMeal,
+        activeTab, setActiveTab,
       }}
     >
       {children}
@@ -296,9 +278,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 }
 
 export function useApp() {
-  const context = useContext(AppContext);
-  if (!context) {
-    throw new Error("useApp must be used within AppProvider");
-  }
-  return context;
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error("useApp must be used within AppProvider");
+  return ctx;
 }
