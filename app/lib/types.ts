@@ -1,4 +1,4 @@
-export type TabType = "home" | "explore" | "favorites" | "profile";
+export type TabType = "home" | "explore" | "fridge" | "favorites" | "profile";
 
 export interface QuizState {
   name: string;
@@ -29,6 +29,11 @@ export interface QuizState {
   targetWeight: number | null;
   weightUnit: string;
   appliances: string[];
+  breakfastVarieties: number;
+  lunchVarieties: number;
+  dinnerVarieties: number;
+  snackVarieties: number;
+  lunchboxVarieties: number;
 }
 
 export interface UserProfile {
