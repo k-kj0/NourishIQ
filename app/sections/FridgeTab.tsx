@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client";
 
 import { useState, useRef } from "react";
@@ -852,7 +853,7 @@ function RecipeDetail({
 
           {/* Vitamins */}
           <div className="bg-white rounded-2xl p-4 border border-gray-100 mb-4">
-            <p className="text-xs font-bold text-gray-400 uppercase mb-3">Vitamins & Minerals</p>
+            <p className="text-xs font-bold text-gray-400 uppercase mb-3">Vitamins &amp; Minerals</p>
             <div className="grid grid-cols-2 gap-2">
               {recipe.vitamins.map((v, i) => (
                 <motion.div
