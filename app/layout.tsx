@@ -1,22 +1,22 @@
-import type { Metadata, Viewport } from "next";
+import type { Metadata } from "next";
 import "./globals.css";
+import { AppProvider } from "./AppContext";
 
 export const metadata: Metadata = {
   title: "NourishIQ - Smart Meal Planning",
-  description: "Personalized meal plans based on your preferences, health goals, and lifestyle.",
+  description: "Personalized nutrition and meal planning powered by AI",
 };
 
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  themeColor: "#22c55e",
-};
-
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
-      <body className="bg-[#fafaf8] text-gray-900 antialiased">{children}</body>
+      <body style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+        <AppProvider>{children}</AppProvider>
+      </body>
     </html>
   );
 }
