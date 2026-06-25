@@ -11,18 +11,14 @@ import { BottomNav } from "./BottomNav";
 export function MainDashboard() {
   const { activeTab } = useApp();
 
-  const tabs: Record<string, React.ReactNode> = {
-    home: <HomeTab />,
-    explore: <ExploreTab />,
-    fridge: <FridgeTab />,
-    favorites: <FavoritesTab />,
-    profile: <ProfileTab />,
-  };
-
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       <div className="flex-1 overflow-y-auto">
-        {tabs[activeTab] || <HomeTab />}
+        {activeTab === "home" && <HomeTab />}
+        {activeTab === "explore" && <ExploreTab />}
+        {activeTab === "fridge" && <FridgeTab />}
+        {activeTab === "favorites" && <FavoritesTab />}
+        {activeTab === "profile" && <ProfileTab />}
       </div>
       <BottomNav />
     </div>
