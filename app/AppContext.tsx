@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useCallback, ReactNode } from "react";
 import { TabType, QuizState, UserProfile, CalorieLog } from "./lib/types";
-import { Meal, DayPlan, generateDailyPlan, regenerateMeal, matchCraving, ALL_MEALS } from "./lib/mealData";
+import { Meal, DayPlan, generateDailyPlan, regenerateMeal, matchCraving } from "./lib/mealData";
 
 interface AppContextType {
   currentView: "onboarding" | "dashboard";
@@ -17,12 +17,16 @@ interface AppContextType {
   userProfile: UserProfile;
   dailyPlan: DayPlan;
   regenerateMealForSlot: (slot: string) => void;
+  regenerateMealForDay: (mealId: string, category: string) => void;
   selectedMeal: Meal | null;
   setSelectedMeal: (meal: Meal | null) => void;
   showRecipe: boolean;
   setShowRecipe: (show: boolean) => void;
+  showRecipeSheet: boolean;
+  setShowRecipeSheet: (show: boolean) => void;
   favorites: Meal[];
   toggleFavorite: (meal: Meal) => void;
+  toggleLikeMeal: (mealId: string) => void;
   calorieLog: CalorieLog[];
   logCalories: (date: string, consumed: number, target: number) => void;
   showCravingInput: boolean;
@@ -101,6 +105,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
+  const regenerateMealForDay = useCallback((mealId: string, category: string) => {
+    setDailyPlan((prev) => {
+      const newMeals = regenerateMeal(prev.date, category, prev.meals);
+      return { ...prev, meals: newMeals };
+    });
+  }, []);
+
   const toggleFavorite = useCallback((meal: Meal) => {
     setFavorites((prev) => {
       const exists = prev.find((m) => m.id === meal.id);
@@ -108,6 +119,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       return [...prev, meal];
     });
   }, []);
+
+  const toggleLikeMeal = useCallback((mealId: string) => {
+    setFavorites((prev) => {
+      const exists = prev.find((m) => m.id === mealId);
+      if (exists) return prev.filter((m) => m.id !== mealId);
+      const meal = dailyPlan.meals.find((m) => m.id === mealId);
+      if (meal) return [...prev, meal];
+      return prev;
+    });
+  }, [dailyPlan.meals]);
 
   const logCalories = useCallback((date: string, consumed: number, target: number) => {
     setCalorieLog((prev) => {
@@ -136,12 +157,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
         userProfile,
         dailyPlan,
         regenerateMealForSlot,
+        regenerateMealForDay,
         selectedMeal,
         setSelectedMeal,
         showRecipe,
         setShowRecipe,
+        showRecipeSheet: showRecipe,
+        setShowRecipeSheet: setShowRecipe,
         favorites,
         toggleFavorite,
+        toggleLikeMeal,
         calorieLog,
         logCalories,
         showCravingInput,
