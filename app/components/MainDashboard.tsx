@@ -12,7 +12,7 @@ export function MainDashboard() {
   const { activeTab } = useApp();
 
   return (
-    <div className="pb-20">
+    <div className="min-h-screen">
       {activeTab === "home" && <HomeTab />}
       {activeTab === "explore" && <ExploreTab />}
       {activeTab === "fridge" && <FridgeTab />}
