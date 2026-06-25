@@ -1,19 +1,17 @@
 "use client";
 
-import { AppProvider } from "./AppContext";
-import { MainDashboard } from "./components/MainDashboard";
-import { OnboardingQuiz } from "./components/OnboardingQuiz";
 import { useApp } from "./AppContext";
-
-function AppContent() {
-  const { currentView } = useApp();
-  return currentView === "onboarding" ? <OnboardingQuiz /> : <MainDashboard />;
-}
+import { OnboardingQuiz } from "./components/OnboardingQuiz";
+import { MainDashboard } from "./components/MainDashboard";
+import { RecipeSheet } from "./components/RecipeSheet";
 
 export default function Home() {
+  const { phase } = useApp();
+
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <>
+      {phase === "onboarding" ? <OnboardingQuiz /> : <MainDashboard />}
+      <RecipeSheet />
+    </>
   );
 }
