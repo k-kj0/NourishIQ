@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useApp } from "./AppContext";
 import { OnboardingQuiz } from "./components/OnboardingQuiz";
 import { MainDashboard } from "./components/MainDashboard";
