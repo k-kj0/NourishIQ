@@ -1,30 +1,16 @@
-"use client";
+export const dynamic = "force-dynamic";
 
-import { useApp } from "../AppContext";
-import { HomeTab } from "../sections/HomeTab";
-import { ExploreTab } from "../sections/ExploreTab";
-import { FridgeTab } from "../sections/FridgeTab";
-import { FavoritesTab } from "../sections/FavoritesTab";
-import { ProfileTab } from "../sections/ProfileTab";
-import { BottomNav } from "./BottomNav";
+import { AppProvider } from "./AppContext";
+import { MainDashboard } from "./components/MainDashboard";
+import { RecipeSheet } from "./components/RecipeSheet";
 
-export function MainDashboard() {
-  const { activeTab } = useApp();
-
-  const tabs: Record<string, React.ReactNode> = {
-    home: <HomeTab />,
-    explore: <ExploreTab />,
-    fridge: <FridgeTab />,
-    favorites: <FavoritesTab />,
-    profile: <ProfileTab />,
-  };
-
+export default function Home() {
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
-      <div className="flex-1 overflow-y-auto">
-        {tabs[activeTab] || <HomeTab />}
+    <AppProvider>
+      <div className="h-screen w-full max-w-md mx-auto bg-white shadow-2xl overflow-hidden relative">
+        <MainDashboard />
+        <RecipeSheet />
       </div>
-      <BottomNav />
-    </div>
+    </AppProvider>
   );
 }
