@@ -71,3 +71,195 @@ export const APPLIANCE_OPTIONS = [
   { id: "blender", name: "Blender", desc: "Smoothies & more" },
   { id: "food-processor", name: "Food Processor", desc: "Chop, slice, shred with ease" },
 ];
+
+export const HOME_REMEDIES = [
+  {
+    id: "headache-tea",
+    title: "DIY Hibiscus Tea",
+    symptom: "Headache",
+    benefit:
+      "Hibiscus is rich in antioxidants and may help relax blood vessels, easing tension-related headaches while keeping you hydrated.",
+    ingredients: [
+      "Dried hibiscus flowers (2 tbsp)",
+      "Water (2 cups)",
+      "Honey (1 tsp, optional)",
+      "Fresh mint leaves (a few, optional)",
+    ],
+    steps: [
+      "Bring water to a boil, then remove from heat.",
+      "Add dried hibiscus flowers and steep for 5–7 minutes.",
+      "Strain into a cup. Add honey and mint if desired.",
+      "Sip slowly in a quiet, dim room.",
+    ],
+    prepTime: "10 min",
+  },
+  {
+    id: "fatigue-shot",
+    title: "DIY Ginger Energy Shot",
+    symptom: "Tiredness",
+    benefit:
+      "Fresh ginger and lemon provide a natural pick-me-up, supporting circulation and digestion without the crash of caffeine.",
+    ingredients: [
+      "Fresh ginger, grated (1 tbsp)",
+      "Lemon juice (1 tbsp)",
+      "Water (2 tbsp)",
+      "Honey (1 tsp)",
+      "Pinch of cayenne (optional)",
+    ],
+    steps: [
+      "Grate fresh ginger and squeeze out the juice using a strainer or cheesecloth.",
+      "Mix ginger juice with lemon juice, water, and honey.",
+      "Add a pinch of cayenne if you'd like extra kick.",
+      "Drink immediately, first thing in the morning or mid-afternoon.",
+    ],
+    prepTime: "5 min",
+  },
+  {
+    id: "stomach-ache",
+    title: "Soothing Fennel & Mint Infusion",
+    symptom: "Stomach ache",
+    benefit:
+      "Fennel seeds and mint are traditionally used to relax digestive muscles and reduce bloating and cramping.",
+    ingredients: [
+      "Fennel seeds (1 tsp)",
+      "Fresh mint leaves (5–6)",
+      "Water (1.5 cups)",
+    ],
+    steps: [
+      "Lightly crush the fennel seeds.",
+      "Boil water, then add fennel seeds and mint leaves.",
+      "Simmer for 5 minutes, then strain.",
+      "Sip warm, slowly, after meals.",
+    ],
+    prepTime: "8 min",
+  },
+  {
+    id: "sore-throat",
+    title: "Honey Lemon Ginger Warmer",
+    symptom: "Sore throat",
+    benefit:
+      "Warm honey and lemon coat and soothe an irritated throat, while ginger adds mild anti-inflammatory support.",
+    ingredients: [
+      "Warm water (1 cup)",
+      "Honey (1 tbsp)",
+      "Lemon juice (1 tbsp)",
+      "Fresh ginger, sliced (2–3 pieces)",
+    ],
+    steps: [
+      "Steep sliced ginger in hot water for 5 minutes.",
+      "Let the water cool to warm (not hot).",
+      "Stir in honey and lemon juice.",
+      "Sip slowly, 2–3 times a day as needed.",
+    ],
+    prepTime: "7 min",
+  },
+  {
+    id: "trouble-sleeping",
+    title: "Warm Turmeric Moon Milk",
+    symptom: "Trouble sleeping",
+    benefit:
+      "Warm milk with turmeric and a touch of nutmeg is a traditional bedtime ritual thought to promote relaxation before sleep.",
+    ingredients: [
+      "Milk or plant milk (1 cup)",
+      "Turmeric powder (1/4 tsp)",
+      "Pinch of black pepper",
+      "Pinch of nutmeg",
+      "Honey (1 tsp, optional)",
+    ],
+    steps: [
+      "Warm the milk gently in a saucepan, do not boil.",
+      "Whisk in turmeric, black pepper, and nutmeg.",
+      "Simmer 2–3 minutes, stirring occasionally.",
+      "Sweeten with honey if desired and drink 30 minutes before bed.",
+    ],
+    prepTime: "6 min",
+  },
+  {
+    id: "bloating",
+    title: "Cumin & Coriander Digestive Water",
+    symptom: "Bloating",
+    benefit:
+      "Cumin and coriander seeds are commonly used to support digestion and ease feelings of fullness or bloating.",
+    ingredients: [
+      "Cumin seeds (1 tsp)",
+      "Coriander seeds (1 tsp)",
+      "Water (2 cups)",
+    ],
+    steps: [
+      "Lightly toast cumin and coriander seeds in a dry pan for 1 minute.",
+      "Add water and bring to a boil.",
+      "Simmer for 5 minutes, then strain.",
+      "Sip warm after meals.",
+    ],
+    prepTime: "8 min",
+  },
+];
+
+export const TRAVEL_CUISINES = [
+  {
+    id: "tokyo-ramen",
+    city: "Tokyo",
+    country: "Japan",
+    dish: "Shoyu Ramen",
+    description:
+      "A soy-sauce-based broth ramen with chewy noodles, tender chashu pork, and a soft-boiled egg.",
+    image: "https://images.unsplash.com/photo-1557872943-16a5ac26437e?w=800&q=80",
+    tags: ["Comfort Food", "Umami"],
+    whyTry: "A staple of everyday Tokyo life, found in tiny shops on nearly every street corner.",
+  },
+  {
+    id: "mumbai-vada-pav",
+    city: "Mumbai",
+    country: "India",
+    dish: "Vada Pav",
+    description:
+      "A spiced potato fritter sandwiched in a soft bun with chutneys — Mumbai's favorite street snack.",
+    image: "https://images.unsplash.com/photo-1606491956689-2ea866880c84?w=800&q=80",
+    tags: ["Street Food", "Vegetarian"],
+    whyTry: "Cheap, filling, and iconic — it's practically Mumbai's unofficial fast food.",
+  },
+  {
+    id: "mexico-city-tacos",
+    city: "Mexico City",
+    country: "Mexico",
+    dish: "Tacos al Pastor",
+    description:
+      "Marinated, spit-roasted pork tacos topped with pineapple, onion, and cilantro on a corn tortilla.",
+    image: "https://images.unsplash.com/photo-1551504734-1a8ad9c14a17?w=800&q=80",
+    tags: ["Street Food", "Spicy"],
+    whyTry: "Born from Lebanese immigrants' shawarma technique, now a true Mexico City classic.",
+  },
+  {
+    id: "bangkok-padthai",
+    city: "Bangkok",
+    country: "Thailand",
+    dish: "Pad Thai",
+    description:
+      "Stir-fried rice noodles with shrimp or tofu, peanuts, egg, and a sweet-savory tamarind sauce.",
+    image: "https://images.unsplash.com/photo-1559314809-0d155014e29e?w=800&q=80",
+    tags: ["Quick Meal", "Balanced"],
+    whyTry: "Thailand's most famous export — every street vendor has their own twist on it.",
+  },
+  {
+    id: "rome-carbonara",
+    city: "Rome",
+    country: "Italy",
+    dish: "Spaghetti alla Carbonara",
+    description:
+      "A simple but rich pasta of egg, Pecorino Romano, guanciale, and black pepper — no cream involved.",
+    image: "https://images.unsplash.com/photo-1612874742237-6526221588e3?w=800&q=80",
+    tags: ["High Protein", "Classic"],
+    whyTry: "Skip the touristy versions with cream — the real Roman recipe is silkier and lighter.",
+  },
+  {
+    id: "istanbul-kebab",
+    city: "Istanbul",
+    country: "Turkey",
+    dish: "Iskender Kebab",
+    description:
+      "Thinly sliced döner meat over pita, drenched in tomato sauce and melted butter, served with yogurt.",
+    image: "https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=800&q=80",
+    tags: ["High Protein", "Hearty"],
+    whyTry: "Named after the chef who invented it in the 1860s — a true taste of Ottoman-era Istanbul.",
+  },
+];
