@@ -28,6 +28,7 @@ const FoodDecorations = () => (
 export function OnboardingQuiz() {
   const { quizStep, setQuizStep, totalQuizSteps, quizState, updateQuizState, setCurrentView } = useApp();
   const [direction, setDirection] = useState(1);
+  const [planDays, setPlanDays] = useState(5); 
 
   const progress = ((quizStep - 1) / (totalQuizSteps - 1)) * 100;
 
@@ -305,7 +306,16 @@ export function OnboardingQuiz() {
     );
   };
 
-  const FoodsLoveStep = () => (
+ const FoodsLoveStep = () => {
+  const categoryImages: Record<string, string> = {
+    Meats: "https://images.unsplash.com/photo-1607623814075-e51df1bdc82f?w=100&q=80",
+    Seafood: "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2?w=100&q=80",
+    Dairy: "https://images.unsplash.com/photo-1628088062854-d1870b4553da?w=100&q=80",
+    "Vegan Dairy": "https://images.unsplash.com/photo-1550583724-b2692b85b150?w=100&q=80",
+    Grains: "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=100&q=80",
+  };
+
+  return (
     <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col justify-center px-4 py-6">
       <div className="relative z-10 w-full max-w-sm mx-auto space-y-4">
         <div className="text-center">
@@ -313,23 +323,45 @@ export function OnboardingQuiz() {
           <h2 className="text-2xl font-black text-gray-900">Foods you love</h2>
           <p className="text-gray-400 text-sm mt-1">Select categories you enjoy most</p>
         </div>
-        <div className="space-y-4 max-h-[400px] overflow-y-auto">
-          {Object.entries(FOOD_CATEGORIES).slice(0,5).map(([cat, items]) => (
-            <div key={cat} className="bg-white rounded-2xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-bold text-gray-800 text-sm">{cat}</h3>
+        <div className="space-y-3 max-h-[420px] overflow-y-auto">
+          {Object.entries(FOOD_CATEGORIES).slice(0, 5).map(([cat, items]) => (
+            <div key={cat} className="bg-white rounded-2xl p-4 border border-gray-100">
+              <div className="flex items-center gap-3 mb-3">
+                <img
+                  src={categoryImages[cat] || "https://placehold.co/48x48/f0fdf4/22c55e?text=🍽️"}
+                  alt={cat}
+                  className="w-12 h-12 rounded-xl object-cover flex-shrink-0"
+                  onError={(e) => { (e.target as HTMLImageElement).src = "https://placehold.co/48x48/f0fdf4/22c55e?text=food"; }}
+                />
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-800 text-sm">{cat}</h3>
+                  <p className="text-gray-400 text-xs">{(items as string[]).slice(0, 4).join(", ")}</p>
+                </div>
                 <button className="text-gray-400 text-xs">▲</button>
               </div>
-              <p className="text-gray-400 text-xs mb-3">{(items as string[]).slice(0,5).join(", ")}</p>
               <div className="flex flex-wrap gap-2">
-                {(items as string[]).slice(0,5).map((item) => {
+                {(items as string[]).slice(0, 5).map((item) => {
                   const sel = quizState.lovedFoods.includes(item);
                   return (
-                    <button key={item} onClick={() => {
-                      const updated = sel ? quizState.lovedFoods.filter(x=>x!==item) : [...quizState.lovedFoods, item];
-                      updateQuizState({ lovedFoods: updated });
-                    }}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${sel ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-gray-50 text-gray-600 border-gray-100"}`}>
+                    <button
+                      key={item}
+                      onClick={() => {
+                        const updated = sel
+                          ? quizState.lovedFoods.filter((x) => x !== item)
+                          : [...quizState.lovedFoods, item];
+                        updateQuizState({ lovedFoods: updated });
+                      }}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                        sel
+                          ? "bg-[#22c55e] text-white border-[#22c55e]"
+                          : "bg-white text-gray-600 border-gray-200"
+                      }`}
+                    >
+                      {sel && (
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
                       {item}
                     </button>
                   );
@@ -341,7 +373,7 @@ export function OnboardingQuiz() {
       </div>
     </div>
   );
-
+};
   const FoodsAvoidStep = () => (
     <Shell title="What do you want to avoid?" subtitle="Textures, flavors, and foods you dislike">
       <div className="space-y-5">
@@ -369,7 +401,8 @@ export function OnboardingQuiz() {
     </Shell>
   );
 
-  const CookingTimeStep = () => (
+  const CookingTimeStep = () => {
+  return (
     <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col items-center justify-center px-4">
       <div className="relative z-10 w-full max-w-sm space-y-4">
         <div className="text-center">
@@ -379,32 +412,70 @@ export function OnboardingQuiz() {
         </div>
         <div className="space-y-3">
           {[
-            {id:"under-15",label:"Under 15 mins",icon:"⚡",desc:"Quick & easy",bg:"#fef9c3"},
-            {id:"15-30",label:"15–30 mins",icon:"🕐",desc:"Standard cooking",bg:"#fef3c7"},
-            {id:"30-60",label:"30–60 mins",icon:"👨‍🍳",desc:"Weekend cooking",bg:"#fee2e2"},
-            {id:"1-2-hours",label:"1–2 hours",icon:"🕐",desc:"Special occasions",bg:"#ede9fe"},
-            {id:"meal-prep",label:"I meal prep once a week",icon:"📦",desc:"Batch cooking",bg:"#dbeafe"},
-          ].map(opt => {
+            { id: "under-15", label: "Under 15 mins", icon: "⚡", desc: "Quick & easy", bg: "#fef9c3" },
+            { id: "15-30", label: "15–30 mins", icon: "🕐", desc: "Standard cooking", bg: "#fef3c7" },
+            { id: "30-60", label: "30–60 mins", icon: "👨‍🍳", desc: "Weekend cooking", bg: "#fee2e2" },
+            { id: "1-2-hours", label: "1–2 hours", icon: "🕐", desc: "Special occasions", bg: "#ede9fe" },
+            { id: "meal-prep", label: "I meal prep once a week", icon: "📦", desc: "Batch cooking", bg: "#dbeafe" },
+          ].map((opt) => {
             const sel = quizState.cookingTime === opt.id;
             return (
-              <button key={opt.id} onClick={() => updateQuizState({ cookingTime: opt.id })}
-                className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all text-left border-2 ${sel ? "border-[#22c55e] bg-[#f0fdf4]" : "border-transparent bg-white"}`}>
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background: opt.bg}}>{opt.icon}</div>
+              <button
+                key={opt.id}
+                onClick={() => updateQuizState({ cookingTime: opt.id })}
+                className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all text-left border-2 ${
+                  sel ? "border-[#22c55e] bg-white" : "border-transparent bg-white"
+                }`}
+              >
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{ background: opt.bg }}>
+                  {opt.icon}
+                </div>
                 <div className="flex-1">
                   <p className="font-bold text-gray-900 text-sm">{opt.label}</p>
                   <p className="text-xs text-gray-400">{opt.desc}</p>
                 </div>
-                <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 transition-all ${sel ? "bg-[#22c55e] border-[#22c55e]" : "border-gray-300"}`}>
-                  {sel && <Check className="w-3 h-3 text-white m-auto mt-0.5" />}
+                <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 ${sel ? "bg-[#22c55e] border-[#22c55e]" : "border-gray-300"}`}>
+                  {sel && <svg className="m-auto mt-0.5" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>}
                 </div>
               </button>
             );
           })}
         </div>
+
+        {/* Custom meal planning section — screenshot 6 */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-4">
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3">Custom Meal Planning</p>
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center text-xl flex-shrink-0">📅</div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <p className="font-bold text-gray-900 text-sm">Custom meal planning</p>
+                <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-semibold">Recommended</span>
+              </div>
+              <p className="text-xs text-gray-400">Choose how many days you want to plan</p>
+            </div>
+            <div className="w-5 h-5 rounded-full bg-[#22c55e] border-[#22c55e] border-2 flex items-center justify-center">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3"><polyline points="20 6 9 17 4 12" /></svg>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            {[3, 4, 5, 6, 7].map((d) => (
+              <button
+                key={d}
+                onClick={() => setPlanDays(d)}
+                className={`flex-1 py-2 rounded-xl text-sm font-bold border-2 transition-all ${
+                  planDays === d ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-gray-50 text-gray-600 border-transparent"
+                }`}
+              >
+                {d} days
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   );
-
+};
   const TimingStep = () => (
     <Shell title="Meal timing" subtitle="When do you usually eat? 🍽️">
       <div className="space-y-3">
