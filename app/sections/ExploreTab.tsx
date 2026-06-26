@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useApp } from "../AppContext";
-import { RecipeSheet } from "../components/RecipeSheet";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { APPLIANCE_OPTIONS } from "../lib/mealData";
 import { MEALS as ALL_MEALS } from "../AppContext";
@@ -128,8 +127,6 @@ export function ExploreTab() {
           </button>
         ))}
       </div>
-
-      <RecipeSheet />
     </div>
   );
 }
