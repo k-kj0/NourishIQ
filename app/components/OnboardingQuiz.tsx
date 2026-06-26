@@ -1,4 +1,3 @@
-// In the WeightStep component, replace with this:
 const WeightStep = () => {
   const { quizState, updateQuizState, goNext } = useApp();
   const wantsWeightLoss = quizState.healthGoals.includes("lose-weight");
@@ -28,7 +27,7 @@ const WeightStep = () => {
           <input
             type="number"
             value={quizState.currentWeight || ""}
-            onChange={(e) =>
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               updateQuizState({ currentWeight: parseInt(e.target.value) || null })
             }
             placeholder="0"
@@ -43,7 +42,7 @@ const WeightStep = () => {
           <input
             type="number"
             value={quizState.targetWeight || ""}
-            onChange={(e) =>
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               updateQuizState({ targetWeight: parseInt(e.target.value) || null })
             }
             placeholder="0"
