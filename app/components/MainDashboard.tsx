@@ -1,11 +1,13 @@
 "use client";
 
 import { useApp, MEALS, Meal } from "../AppContext";
-import { Bell, ChevronDown, ChevronLeft, ChevronRight, Volume2, Heart, Home, Compass, Refrigerator, Star } from "lucide-react";
+import { Bell, ChevronDown, ChevronLeft, ChevronRight, Volume2, Heart, Home, Compass, Refrigerator, Star, Target, ShoppingCart, Check, X } from "lucide-react";
+import { useState } from "react";
 import { ExploreTab } from "../sections/ExploreTab";
 import { FridgeTab } from "../sections/FridgeTab";
 import { FavoritesTab } from "../sections/FavoritesTab";
 import { ProfileTab } from "../sections/ProfileTab";
+import { WEEKLY_CHALLENGE } from "../lib/mealData";
 
 const DAYS = [
   { day: "MON", date: 22 },
@@ -116,7 +118,8 @@ function MealRow({ meal }: { meal: Meal }) {
 }
 
 export function MainDashboard() {
-  const { profile, setActiveTab, activeTab } = useApp();
+  const { profile, setActiveTab, activeTab, weeklyGoal, logGoalProgress, groceryList, toggleGroceryItem, selectedDayIndex, setSelectedDayIndex, setSelectedMeal, setShowRecipeSheet } = useApp();
+  const [showGrocery, setShowGrocery] = useState(false);
   const userName = profile.name;
 
   const tabs = [
@@ -150,7 +153,7 @@ export function MainDashboard() {
             {/* Date & nutrients */}
             <div className="px-4 mb-4">
               <button className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-3">
-                📅 Thursday, June 25
+                📅 {DAYS[selectedDayIndex].day}, June {DAYS[selectedDayIndex].date}
                 <ChevronDown size={16} className="text-gray-400" />
               </button>
               <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
@@ -173,25 +176,102 @@ export function MainDashboard() {
             {/* Calendar */}
             <div className="px-4 mb-4">
               <div className="flex items-center justify-between">
-                <button className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+                <button
+                  onClick={() => setSelectedDayIndex(Math.max(0, selectedDayIndex - 1))}
+                  className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center"
+                >
                   <ChevronLeft size={14} className="text-gray-600" />
                 </button>
                 <div className="flex gap-2">
-                  {DAYS.map((d) => {
-                    const isToday = d.date === 25;
+                  {DAYS.map((d, i) => {
+                    const isSelected = i === selectedDayIndex;
                     return (
-                      <div key={d.date} className={`flex flex-col items-center px-2 py-2 rounded-2xl transition-all ${isToday ? "bg-green-500 text-white" : "text-gray-500"}`}>
+                      <button
+                        key={d.date}
+                        onClick={() => setSelectedDayIndex(i)}
+                        className={`flex flex-col items-center px-2 py-2 rounded-2xl transition-all ${isSelected ? "bg-green-500 text-white" : "text-gray-500"}`}
+                      >
                         <span className="text-xs font-medium">{d.day}</span>
-                        <span className={`text-sm font-bold ${isToday ? "text-white" : "text-gray-800"}`}>{d.date}</span>
-                        {isToday && <span className="w-1.5 h-1.5 rounded-full bg-white mt-0.5" />}
-                      </div>
+                        <span className={`text-sm font-bold ${isSelected ? "text-white" : "text-gray-800"}`}>{d.date}</span>
+                        {isSelected && <span className="w-1.5 h-1.5 rounded-full bg-white mt-0.5" />}
+                      </button>
                     );
                   })}
                 </div>
-                <button className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+                <button
+                  onClick={() => setSelectedDayIndex(Math.min(DAYS.length - 1, selectedDayIndex + 1))}
+                  className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center"
+                >
                   <ChevronRight size={14} className="text-gray-600" />
                 </button>
               </div>
+            </div>
+
+            {/* Weekly Goal */}
+            <div className="px-4 mb-4">
+              <div className="card-soft p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <Target size={16} style={{ color: "var(--brand-deep)" }} />
+                    <span className="text-sm font-bold text-gray-800">{weeklyGoal.label}</span>
+                  </div>
+                  <span className="text-xs font-semibold text-gray-500">
+                    {weeklyGoal.current}/{weeklyGoal.target} {weeklyGoal.unit}
+                  </span>
+                </div>
+                <div className="h-2 rounded-full bg-gray-100 overflow-hidden mb-3">
+                  <div
+                    className="h-full rounded-full"
+                    style={{ width: `${Math.min(100, (weeklyGoal.current / weeklyGoal.target) * 100)}%`, background: "var(--gradient-cta)" }}
+                  />
+                </div>
+                <button
+                  onClick={() => logGoalProgress(50)}
+                  className="w-full py-2 rounded-xl text-sm font-semibold"
+                  style={{ background: "var(--brand-soft)", color: "var(--brand-deep)" }}
+                >
+                  + Log progress
+                </button>
+              </div>
+            </div>
+
+            {/* Weekly Challenge */}
+            <div className="px-4 mb-4">
+              <p className="text-sm font-bold text-gray-800 mb-2">{WEEKLY_CHALLENGE.weekLabel}</p>
+              <div className="grid grid-cols-2 gap-3">
+                {[
+                  { label: "Sweet Treat", meal: WEEKLY_CHALLENGE.sweet },
+                  { label: "Savory Treat", meal: WEEKLY_CHALLENGE.savory },
+                ].map(({ label, meal }) => (
+                  <button
+                    key={meal.id}
+                    onClick={() => { setSelectedMeal(meal as any); setShowRecipeSheet(true); }}
+                    className="bg-white rounded-2xl overflow-hidden shadow-sm text-left"
+                  >
+                    <img src={meal.image} alt={meal.name} className="w-full h-20 object-cover" />
+                    <div className="p-2.5">
+                      <p className="text-[10px] font-bold uppercase" style={{ color: "var(--accent-pink)" }}>{label}</p>
+                      <p className="text-xs font-semibold text-gray-800 truncate">{meal.name}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Grocery list trigger */}
+            <div className="px-4 mb-4">
+              <button
+                onClick={() => setShowGrocery(true)}
+                className="w-full flex items-center justify-between card-soft p-4"
+              >
+                <div className="flex items-center gap-2">
+                  <ShoppingCart size={16} className="text-orange-500" />
+                  <span className="text-sm font-bold text-gray-800">Grocery list</span>
+                </div>
+                <span className="text-xs text-gray-500">
+                  {groceryList.filter((g) => g.checked).length}/{groceryList.length} done
+                </span>
+              </button>
             </div>
 
             {/* Meal list */}
@@ -264,6 +344,36 @@ export function MainDashboard() {
           );
         })}
       </div>
+
+      {/* Grocery list modal */}
+      {showGrocery && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-end justify-center">
+          <div className="w-full max-w-md bg-white rounded-t-[2rem] max-h-[80vh] overflow-y-auto p-5">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-900">Grocery list</h3>
+              <button onClick={() => setShowGrocery(false)} className="p-2 bg-gray-100 rounded-full">
+                <X size={18} />
+              </button>
+            </div>
+            <div className="space-y-2 pb-4">
+              {groceryList.map((item) => (
+                <button
+                  key={item.name}
+                  onClick={() => toggleGroceryItem(item.name)}
+                  className="w-full flex items-center justify-between p-3 rounded-2xl bg-gray-50"
+                >
+                  <span className={item.checked ? "text-sm text-gray-400 line-through" : "text-sm text-gray-800 font-medium"}>
+                    {item.name}
+                  </span>
+                  <div className={item.checked ? "w-5 h-5 rounded-full bg-green-500 flex items-center justify-center" : "w-5 h-5 rounded-full border-2 border-gray-300"}>
+                    {item.checked && <Check size={12} className="text-white" />}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
