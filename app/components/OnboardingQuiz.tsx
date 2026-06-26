@@ -20,7 +20,6 @@ import {
   Sun,
   Thermometer,
   Activity,
-  Brain,
   Smile,
   UtensilsCrossed,
   Coffee,
@@ -282,7 +281,7 @@ export function OnboardingQuiz() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Foods you love</h2>
             </div>
             <div className="grid grid-cols-3 gap-2">
-              {["Chicken", "Fish", "Eggs", "Paneer", "Rice", "Pasta", "Burgers", "Salads", "Soups", "Desserts", "Fruits", "Bread"].map((food) => (
+              {["Chicken", "Fish", "Eggs", "Paneer", "Rice", "Pasta", "Burgers", "Salads", "Soups", "Desserts", "Fruits", "Bread", "Seafood", "Tofu", "Lentils", "Cheese", "Yogurt", "Nuts", "Avocado", "Mushrooms", "Curry", "Noodles"].map((food) => (
                 <button
                   key={food}
                   onClick={() => {
@@ -302,6 +301,31 @@ export function OnboardingQuiz() {
         return (
           <div className="space-y-6">
             <div className="text-center">
+              <Smile size={40} className="text-green-500 mx-auto mb-3" />
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">Foods you'd rather skip</h2>
+              <p className="text-sm text-gray-500">We'll avoid suggesting these</p>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {["Mushrooms", "Cilantro", "Olives", "Liver", "Shellfish", "Blue Cheese", "Tofu", "Eggplant", "Okra", "Beets", "Anchovies", "Tripe"].map((food) => (
+                <button
+                  key={food}
+                  onClick={() => {
+                    const current = quizState.avoidedTextures;
+                    const updated = current.includes(food) ? current.filter((f: string) => f !== food) : [...current, food];
+                    updateQuizState({ avoidedTextures: updated });
+                  }}
+                  className={quizState.avoidedTextures.includes(food) ? "p-2 rounded-xl border-2 border-red-400 bg-red-50 text-red-600 font-semibold text-xs" : "p-2 rounded-xl border-2 border-gray-100 text-gray-700 font-medium text-xs"}
+                >
+                  {food}
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      case 12:
+        return (
+          <div className="space-y-6">
+            <div className="text-center">
               <Activity size={40} className="text-green-500 mx-auto mb-3" />
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Meals per day</h2>
             </div>
@@ -318,7 +342,7 @@ export function OnboardingQuiz() {
             </div>
           </div>
         );
-      case 12:
+      case 13:
         return (
           <div className="space-y-6">
             <div className="text-center">
@@ -346,25 +370,7 @@ export function OnboardingQuiz() {
             </div>
           </div>
         );
-      case 13:
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <Brain size={40} className="text-green-500 mx-auto mb-3" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Your age</h2>
-            </div>
-            <input
-              type="number"
-              value={quizState.age || ""}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateQuizState({ age: parseInt(e.target.value) || null })}
-              placeholder="Enter your age"
-              className="w-full p-4 rounded-2xl border-2 border-gray-100 focus:border-green-400 outline-none text-center text-lg font-medium"
-            />
-          </div>
-        );
       case 14:
-        return null;
-      case 15:
         return (
           <div className="space-y-6">
             <div className="text-center">
@@ -372,7 +378,7 @@ export function OnboardingQuiz() {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">Avoid flavors</h2>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              {["Very Spicy", "Bitter", "Sour", "Very Sweet", "Fishy", "Pungent"].map((flavor) => (
+              {["Very Spicy", "Bitter", "Sour", "Very Sweet", "Fishy", "Pungent", "Smoky", "Tangy"].map((flavor) => (
                 <button
                   key={flavor}
                   onClick={() => {
@@ -388,7 +394,7 @@ export function OnboardingQuiz() {
             </div>
           </div>
         );
-      case 16:
+      case 15:
         return (
           <div className="space-y-6">
             <div className="text-center">
@@ -416,27 +422,26 @@ export function OnboardingQuiz() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen flex flex-col" style={{ background: "var(--color-bg)" }}>
       <div className="flex-1 px-6 py-8 max-w-md mx-auto w-full">
         <div className="mb-8">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-xs font-semibold text-gray-500">Step {quizStep} of {totalQuizSteps}</span>
-            <span className="text-xs font-semibold text-green-600">{Math.round((quizStep / totalQuizSteps) * 100)}%</span>
+            <span className="text-xs font-semibold" style={{ color: "var(--color-muted-foreground)" }}>{quizStep} / {totalQuizSteps}</span>
           </div>
-          <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-            <div className="h-full bg-green-500 rounded-full transition-all duration-300" style={{ width: `${(quizStep / totalQuizSteps) * 100}%` }} />
+          <div className="h-1.5 rounded-full overflow-hidden bg-gray-100">
+            <div className="h-full rounded-full transition-all duration-300" style={{ width: `${(quizStep / totalQuizSteps) * 100}%`, background: "var(--gradient-cta)" }} />
           </div>
         </div>
         <div className="animate-fade-in">
           {renderStep()}
         </div>
       </div>
-      <div className="px-6 py-4 border-t border-gray-100 max-w-md mx-auto w-full">
+      <div className="px-6 py-4 max-w-md mx-auto w-full">
         <div className="flex gap-3">
           {quizStep > 1 && (
             <button
               onClick={prevStep}
-              className="px-6 py-3 rounded-2xl border-2 border-gray-200 text-gray-700 font-semibold flex items-center gap-2"
+              className="px-6 py-3 rounded-full border-2 border-gray-200 text-gray-700 font-semibold flex items-center gap-2"
             >
               <ChevronLeft size={18} />
               Back
@@ -444,9 +449,10 @@ export function OnboardingQuiz() {
           )}
           <button
             onClick={nextStep}
-            className="flex-1 py-3 rounded-2xl bg-green-500 text-white font-semibold flex items-center justify-center gap-2"
+            className="flex-1 py-3 rounded-full text-white font-bold flex items-center justify-center gap-2"
+            style={{ background: "var(--gradient-cta)" }}
           >
-            {quizStep === totalQuizSteps ? "Finish" : "Next"}
+            {quizStep === totalQuizSteps ? "Finish" : "Continue"}
             <ChevronRight size={18} />
           </button>
         </div>
