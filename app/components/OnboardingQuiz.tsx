@@ -61,7 +61,10 @@ export function OnboardingQuiz() {
       initials: quizState.name ? quizState.name.substring(0, 2).toUpperCase() : "ME",
       goal: quizState.healthGoals[0] || "Eat Healthier",
       targetCalories: 2000,
-    } as any);
+      currentWeight: quizState.currentWeight,
+      targetWeight: quizState.targetWeight,
+      weightUnit: quizState.weightUnit,
+    });
     setCurrentView("dashboard");
   };
 
