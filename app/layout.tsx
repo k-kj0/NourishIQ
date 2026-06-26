@@ -1,20 +1,19 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "./AppContext";
 
+const inter = Inter({ subsets: ["latin"] });
+
 export const metadata: Metadata = {
-  title: "NourishIQ - Smart Meal Planning",
-  description: "Personalized nutrition and meal planning powered by AI",
+  title: "NourishIQ",
+  description: "Smart meal planning, made personal",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body style={{ fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
+      <body className={inter.className}>
         <AppProvider>{children}</AppProvider>
       </body>
     </html>
