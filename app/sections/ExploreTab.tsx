@@ -10,7 +10,7 @@ import { MEALS as ALL_MEALS } from "../AppContext";
 const filters = ["All", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Beverage"];
 
 export function ExploreTab() {
-  const { setSelectedMeal, setShowRecipeSheet, applianceFilter, setApplianceFilter } = useApp();
+  const { setSelectedMeal, setShowRecipeSheet } = useApp();
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilterPopup, setShowFilterPopup] = useState(false);
