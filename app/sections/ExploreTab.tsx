@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useApp } from "../AppContext";
 import { RecipeSheet } from "../components/RecipeSheet";
 import { Search, SlidersHorizontal, X } from "lucide-react";
-import { APPLIANCE_OPTIONS, ALL_MEALS } from "../lib/mealData";
+import { APPLIANCE_OPTIONS } from "../lib/mealData";
+import { MEALS as ALL_MEALS } from "../AppContext";
 
 const filters = ["All", "Breakfast", "Lunch", "Dinner", "Snack", "Dessert", "Beverage"];
 
