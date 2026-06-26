@@ -1,441 +1,305 @@
 "use client";
 
 import { useState } from "react";
-import { Camera, PenLine, ChefHat, History, ChevronDown, X, Heart, Clock, Leaf, Flame, Sparkles } from "lucide-react";
-
-interface Recipe {
-  id: string;
-  name: string;
-  description: string;
-  time: string;
-  servings: number;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  sugar: number;
-  vitamins: { name: string; amount: string; percent: string }[];
-  ingredients: { item: string; amount: string }[];
-  steps: { step: number; text: string }[];
-}
-
-const sampleRecipe: Recipe = {
-  id: "r1",
-  name: "Chocolate Banana Pudding",
-  description: "A creamy, rich and healthy dessert made with simple ingredients you already have!",
-  time: "5 min",
-  servings: 2,
-  calories: 245,
-  protein: 6,
-  carbs: 34,
-  fat: 10,
-  sugar: 18,
-  vitamins: [
-    { name: "Potassium", amount: "422mg", percent: "14%" },
-    { name: "Magnesium", amount: "58mg", percent: "12%" },
-    { name: "Vitamin C", amount: "10mg", percent: "8%" },
-    { name: "Iron", amount: "1.8mg", percent: "10%" },
-    { name: "Calcium", amount: "45mg", percent: "4%" },
-  ],
-  ingredients: [
-    { item: "Ripe banana", amount: "1 large" },
-    { item: "Cocoa powder", amount: "2 tbsp" },
-    { item: "Greek yogurt", amount: "1/2 cup" },
-    { item: "Honey", amount: "1 tbsp" },
-    { item: "Chia seeds", amount: "1 tsp" },
-  ],
-  steps: [
-    { step: 1, text: "Peel the banana and mash it in a bowl until smooth." },
-    { step: 2, text: "Add cocoa powder, Greek yogurt, and honey. Mix well." },
-    { step: 3, text: "Fold in chia seeds and refrigerate for 10 minutes." },
-    { step: 4, text: "Serve chilled with toppings of your choice." },
-  ],
-};
+import { useApp } from "../AppContext";
+import { Search, ChefHat, Flame, Droplets, Leaf } from "lucide-react";
+import { HOME_REMEDIES, TRAVEL_CUISINES } from "../lib/mealData";
 
 export function FridgeTab() {
-  const [activeTab, setActiveTab] = useState<"scan" | "type">("type");
-  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
-  const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
-  const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
-  const [isLiked, setIsLiked] = useState(false);
+  const { setSelectedMeal, setShowRecipeSheet } = useApp();
+  const [activeSection, setActiveSection] = useState<
+    "fridge" | "remedies" | "travel"
+  >("fridge");
+  const [fridgeItems, setFridgeItems] = useState("");
+  const [remedySymptom, setRemedySymptom] = useState("");
+  const [selectedRemedy, setSelectedRemedy] = useState<any>(null);
 
-  const toggleIngredient = (item: string) => {
-    setCheckedIngredients((prev) => {
-      const next = new Set(prev);
-      if (next.has(item)) next.delete(item);
-      else next.add(item);
-      return next;
-    });
+  const handleFindRecipes = () => {
+    // Demo recipe from fridge
+    const demoRecipe = {
+      id: "fridge-demo",
+      name: "Veggie Stir Fry",
+      category: "dinner",
+      image:
+        "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=800&q=80",
+      cookTime: "15 min",
+      servings: 2,
+      calories: 320,
+      protein: 18,
+      carbs: 42,
+      fat: 10,
+      ingredients: [
+        "Mixed Vegetables (2 cups)",
+        "Soy Sauce (2 tbsp)",
+        "Garlic (2 cloves)",
+        "Olive Oil (1 tbsp)",
+        "Rice, cooked (1 cup)",
+      ],
+      steps: [
+        { step: 1, text: "Heat oil in wok over high heat", time: "1 min" },
+        { step: 2, text: "Add garlic and vegetables, stir fry 5 min", time: "5 min" },
+        { step: 3, text: "Add soy sauce and toss", time: "1 min" },
+        { step: 4, text: "Serve over rice", time: "1 min" },
+      ],
+      substitutes: [],
+      benefits: ["Quick and healthy", "Uses whatever vegetables you have"],
+    };
+    setSelectedMeal(demoRecipe);
+    setShowRecipeSheet(true);
   };
 
-  const toggleStep = (step: number) => {
-    setCompletedSteps((prev) => {
-      const next = new Set(prev);
-      if (next.has(step)) next.delete(step);
-      else next.add(step);
-      return next;
-    });
-  };
-
-  if (selectedRecipe) {
-    return (
-      <div className="max-w-md mx-auto bg-[#fafaf8] min-h-screen pb-24">
-        {/* Header */}
-        <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-          <button
-            onClick={() => setSelectedRecipe(null)}
-            className="flex items-center gap-1 text-gray-600"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="15 18 9 12 15 6" />
-            </svg>
-          </button>
-          <h2 className="text-lg font-bold text-gray-900">Recipe</h2>
-          <button className="text-gray-400">
-            <History size={20} />
-          </button>
-        </div>
-
-        <div className="px-4">
-          {/* Recipe Image Placeholder */}
-          <div className="bg-gradient-to-br from-amber-100 to-orange-100 rounded-3xl h-48 flex items-center justify-center mb-4">
-            <span className="text-6xl">🍫</span>
-          </div>
-
-          <div className="bg-white rounded-3xl p-5 shadow-sm">
-            <div className="flex items-start justify-between mb-2">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">{selectedRecipe.name}</h2>
-                <p className="text-sm text-gray-500">{selectedRecipe.description}</p>
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setIsLiked(!isLiked)}
-                  className={`${isLiked ? "text-red-400" : "text-gray-300"}`}
-                >
-                  <Heart size={20} fill={isLiked ? "currentColor" : "none"} />
-                </button>
-                <button className="text-gray-400">
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-
-            {/* Meta */}
-            <div className="flex items-center gap-3 text-sm text-gray-500 mb-4">
-              <span className="flex items-center gap-1"><Leaf size={14} /> 5 ingredients</span>
-              <span>Sweet</span>
-              <span className="flex items-center gap-1">🌶 Medium Spice</span>
-              <span className="flex items-center gap-1"><Clock size={14} /> {selectedRecipe.time}</span>
-            </div>
-
-            {/* Macros */}
-            <div className="flex gap-4 mb-4">
-              <div className="text-center">
-                <p className="text-lg font-bold text-gray-800">{selectedRecipe.calories}</p>
-                <p className="text-[10px] text-gray-400">kcal</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-orange-400">{selectedRecipe.protein}g</p>
-                <p className="text-[10px] text-gray-400">protein</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-amber-400">{selectedRecipe.carbs}g</p>
-                <p className="text-[10px] text-gray-400">carbs</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-yellow-400">{selectedRecipe.fat}g</p>
-                <p className="text-[10px] text-gray-400">fat</p>
-              </div>
-              <div className="text-center">
-                <p className="text-lg font-bold text-red-400">{selectedRecipe.sugar}g</p>
-                <p className="text-[10px] text-gray-400">sugar</p>
-              </div>
-            </div>
-
-            {/* Nutrition & Vitamins */}
-            <div className="bg-green-50 rounded-2xl p-4 mb-4">
-              <div className="flex items-center gap-2 mb-3">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-600">
-                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 16a1 1 0 1 1 1-1 1 1 0 0 1-1 1zm1-5V7a1 1 0 0 0-2 0v6a1 1 0 0 0 2 0z" />
-                </svg>
-                <h4 className="text-sm font-bold text-gray-800">Nutrition & Vitamins</h4>
-                <span className="text-[10px] text-gray-400 ml-auto">per serving</span>
-              </div>
-              <div className="grid grid-cols-5 gap-2">
-                {selectedRecipe.vitamins.map((v) => (
-                  <div key={v.name} className="text-center bg-white rounded-xl p-2">
-                    <p className="text-[10px] font-bold text-gray-700">{v.amount}</p>
-                    <p className="text-[8px] text-gray-400">{v.name}</p>
-                    <p className="text-[8px] text-green-500">{v.percent}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Instructions */}
-            <div className="mb-4">
-              <button className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
-                <span className="text-sm font-semibold text-gray-700">Instructions</span>
-                <ChevronDown size={18} className="text-gray-400" />
-              </button>
-            </div>
-
-            {/* Why this is good for you */}
-            <div className="bg-green-50 rounded-2xl p-4 mb-4">
-              <div className="flex items-start gap-2">
-                <span className="text-green-500 text-lg">🌿</span>
-                <div>
-                  <h4 className="text-sm font-bold text-green-800 mb-1">Why this is good for you</h4>
-                  <p className="text-xs text-green-700 leading-relaxed">
-                    Great source of potassium and magnesium which support muscle function and help maintain energy levels.
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-3">
-              <button className="flex-1 flex items-center justify-center gap-2 bg-white border-2 border-gray-200 text-gray-700 font-semibold py-3 rounded-2xl">
-                <Sparkles size={18} className="text-purple-500" />
-                Regenerate
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-2 bg-pink-400 hover:bg-pink-500 text-white font-semibold py-3 rounded-2xl transition-colors">
-                <Heart size={18} />
-                Save to Favorites
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const filteredRemedies = remedySymptom
+    ? HOME_REMEDIES.filter(
+        (r) =>
+          r.symptom.toLowerCase().includes(remedySymptom.toLowerCase()) ||
+          r.title.toLowerCase().includes(remedySymptom.toLowerCase())
+      )
+    : HOME_REMEDIES;
 
   return (
-    <div className="max-w-md mx-auto bg-[#fafaf8] min-h-screen pb-24">
-      {/* Header */}
-      <div className="px-5 pt-5 pb-3 flex items-center justify-between">
-        <button className="text-gray-600">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <polyline points="15 18 9 12 15 6" />
-          </svg>
-        </button>
-        <h2 className="text-xl font-bold text-gray-900">What&apos;s in your fridge?</h2>
-        <button className="flex items-center gap-1 text-sm text-purple-500 font-medium">
-          <History size={16} />
-          History
-        </button>
+    <div className="max-w-md mx-auto px-4 pt-6 pb-24">
+      <h1 className="text-2xl font-extrabold text-gray-900 mb-1">
+        What&apos;s in your{" "}
+        <span className="text-green-500">fridge?</span>
+      </h1>
+      <p className="text-sm text-gray-500 mb-4">
+        Let AI turn it into something delicious
+      </p>
+
+      {/* Section Tabs */}
+      <div className="flex gap-2 mb-4">
+        {[
+          { id: "fridge", label: "Fridge", icon: ChefHat },
+          { id: "remedies", label: "Remedies", icon: Leaf },
+          { id: "travel", label: "Travel", icon: Droplets },
+        ].map((sec) => {
+          const Icon = sec.icon;
+          return (
+            <button
+              key={sec.id}
+              onClick={() => setActiveSection(sec.id as any)}
+              className={
+                activeSection === sec.id
+                  ? "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-green-500 text-white"
+                  : "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-600 border border-gray-200"
+              }
+            >
+              <Icon size={16} />
+              {sec.label}
+            </button>
+          );
+        })}
       </div>
 
-      <p className="px-5 text-sm text-gray-500 mb-4">Let AI turn it into something delicious</p>
-
-      {/* Scan / Type Options */}
-      <div className="px-4 flex gap-3 mb-4">
-        <button
-          onClick={() => setActiveTab("scan")}
-          className={`flex-1 p-4 rounded-2xl border-2 text-center transition-all ${
-            activeTab === "scan"
-              ? "bg-blue-50 border-blue-200 shadow-sm"
-              : "bg-white border-gray-100"
-          }`}
-        >
-          <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-2">
-            <Camera size={24} className="text-blue-500" />
-          </div>
-          <p className="text-sm font-bold text-gray-800">Scan your fridge</p>
-          <p className="text-xs text-gray-400 mt-0.5">Take a photo and let AI see what you have</p>
-        </button>
-        <button
-          onClick={() => setActiveTab("type")}
-          className={`flex-1 p-4 rounded-2xl border-2 text-center transition-all ${
-            activeTab === "type"
-              ? "bg-green-50 border-green-200 shadow-sm"
-              : "bg-white border-gray-100"
-          }`}
-        >
-          <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-2">
-            <PenLine size={24} className="text-green-500" />
-          </div>
-          <p className="text-sm font-bold text-gray-800">Type ingredients</p>
-          <p className="text-xs text-gray-400 mt-0.5">List what you have in your fridge</p>
-        </button>
-      </div>
-
-      {/* Customize Preferences */}
-      <div className="px-4 mb-4">
-        <div className="flex items-center gap-2 mb-3">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-gray-400">
-            <path d="M12 20h9" />
-            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z" />
-          </svg>
-          <span className="text-sm font-semibold text-gray-700">Customize your preferences</span>
-        </div>
-
-        <div className="flex gap-2 mb-3">
-          <div className="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2 border border-gray-100">
-            <ChefHat size={14} className="text-gray-400" />
-            <span className="text-xs text-gray-600">Stovetop</span>
-            <ChevronDown size={12} className="text-gray-400" />
-          </div>
-          <div className="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2 border border-gray-100">
-            <Leaf size={14} className="text-green-500" />
-            <span className="text-xs text-gray-600">3 Ingredients</span>
-            <ChevronDown size={12} className="text-gray-400" />
-          </div>
-          <div className="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2 border border-gray-100">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-pink-400">
-              <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-            </svg>
-            <span className="text-xs text-gray-600">Sweet</span>
-            <ChevronDown size={12} className="text-gray-400" />
-          </div>
-          <div className="flex items-center gap-1.5 bg-white rounded-xl px-3 py-2 border border-gray-100">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-400">
-              <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-            </svg>
-            <span className="text-xs text-gray-600">Medium</span>
-            <ChevronDown size={12} className="text-gray-400" />
-          </div>
-        </div>
-
-        {/* Additional preferences */}
-        <p className="text-xs text-gray-400 mb-2">Additional preferences (optional)</p>
-        <div className="flex gap-2 flex-wrap">
-          {["No cook", "No bake", "Low spice", "High protein", "Quick (under 20 min)"].map((tag) => (
-            <span key={tag} className="px-3 py-1.5 bg-white border border-gray-200 rounded-full text-xs text-gray-600">
-              {tag}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Find Recipes Button */}
-      <div className="px-4 mb-6">
-        <button
-          onClick={() => setSelectedRecipe(sampleRecipe)}
-          className="w-full bg-gradient-to-r from-purple-500 via-pink-500 to-rose-400 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-pink-200"
-        >
-          <Sparkles size={20} />
-          Find recipes
-        </button>
-      </div>
-
-      {/* AI Recipe Suggestions */}
-      <div className="px-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <Sparkles size={16} className="text-purple-500" />
-            <h3 className="text-sm font-bold text-gray-800">AI Recipe Suggestions</h3>
-            <p className="text-xs text-gray-400">Based on your fridge, preferences & goals</p>
-          </div>
-          <button className="flex items-center gap-1 text-xs text-gray-500">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M11 6H3" />
-              <path d="M16 6h-2" />
-              <path d="M21 6h-2" />
-              <path d="M19 12h-8" />
-              <path d="M8 12H6" />
-              <path d="M3 12h1" />
-              <path d="M13 18H3" />
-              <path d="M18 18h-2" />
-              <path d="M21 18h-1" />
-            </svg>
-            Sort
-          </button>
-        </div>
-
-        {/* Recipe Card */}
-        <div
-          onClick={() => setSelectedRecipe(sampleRecipe)}
-          className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100 cursor-pointer"
-        >
-          <div className="h-44 bg-gradient-to-br from-amber-100 via-orange-50 to-yellow-100 flex items-center justify-center relative">
-            <span className="text-7xl">🍮</span>
-            <div className="absolute top-3 right-3 flex items-center gap-2">
+      {/* FRIDGE SECTION */}
+      {activeSection === "fridge" && (
+        <div>
+          <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
+            <textarea
+              value={fridgeItems}
+              onChange={(e) => setFridgeItems(e.target.value)}
+              placeholder="Type ingredients you have: tomatoes, eggs, spinach, cheese..."
+              className="w-full h-24 p-3 rounded-xl bg-gray-50 border border-gray-100 resize-none outline-none text-sm"
+            />
+            <div className="flex gap-2 mt-3">
+              <button className="flex-1 py-2.5 bg-gray-100 rounded-xl text-sm font-semibold text-gray-600 flex items-center justify-center gap-2">
+                <Search size={16} />
+                Scan Fridge
+              </button>
               <button
-                onClick={(e) => { e.stopPropagation(); setIsLiked(!isLiked); }}
-                className={`w-8 h-8 rounded-full bg-white/80 flex items-center justify-center ${isLiked ? "text-red-400" : "text-gray-400"}`}
+                onClick={handleFindRecipes}
+                className="flex-1 py-2.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl text-sm font-semibold"
               >
-                <Heart size={16} fill={isLiked ? "currentColor" : "none"} />
-              </button>
-              <button className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center text-gray-400">
-                <X size={16} />
+                Find Recipes
               </button>
             </div>
           </div>
-          <div className="p-4">
-            <h4 className="font-bold text-gray-900 mb-1">{sampleRecipe.name}</h4>
-            <p className="text-xs text-gray-500 mb-3">{sampleRecipe.description}</p>
 
-            <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
-              <span className="flex items-center gap-1"><Leaf size={12} /> 5 ingredients</span>
-              <span>Sweet</span>
-              <span className="flex items-center gap-1">🌶 Medium Spice</span>
-              <span className="flex items-center gap-1"><Clock size={12} /> {sampleRecipe.time}</span>
+          {/* Preferences */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
+            <p className="text-sm font-semibold text-gray-700 mb-3">
+              Customize preferences
+            </p>
+            <div className="flex gap-2 flex-wrap">
+              {["Stovetop", "3 Ingredients", "Sweet", "Medium", "No cook", "High protein"].map(
+                (tag) => (
+                  <span
+                    key={tag}
+                    className="px-3 py-1.5 bg-gray-100 rounded-full text-xs font-medium text-gray-600"
+                  >
+                    {tag}
+                  </span>
+                )
+              )}
             </div>
+          </div>
 
-            <div className="flex gap-3 mb-3">
-              <div className="text-center">
-                <p className="text-sm font-bold text-gray-800">{sampleRecipe.calories}</p>
-                <p className="text-[9px] text-gray-400">kcal</p>
+          {/* AI Suggestions */}
+          <div className="bg-white rounded-2xl p-4 shadow-sm">
+            <h3 className="text-sm font-bold text-gray-800 mb-3">
+              AI Recipe Suggestions
+            </h3>
+            <div className="bg-gray-50 rounded-2xl p-3 flex items-center gap-3">
+              <div className="w-16 h-16 bg-orange-100 rounded-xl flex items-center justify-center">
+                <ChefHat size={24} className="text-orange-500" />
               </div>
-              <div className="text-center">
-                <p className="text-sm font-bold text-orange-400">{sampleRecipe.protein}g</p>
-                <p className="text-[9px] text-gray-400">protein</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-bold text-amber-400">{sampleRecipe.carbs}g</p>
-                <p className="text-[9px] text-gray-400">carbs</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-bold text-yellow-400">{sampleRecipe.fat}g</p>
-                <p className="text-[9px] text-gray-400">fat</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm font-bold text-red-400">{sampleRecipe.sugar}g</p>
-                <p className="text-[9px] text-gray-400">sugar</p>
+              <div>
+                <p className="text-sm font-bold text-gray-800">
+                  Veggie Stir Fry
+                </p>
+                <p className="text-xs text-gray-500">
+                  5 ingredients · 15 min · 320 kcal
+                </p>
               </div>
             </div>
+          </div>
+        </div>
+      )}
 
-            {/* Nutrition mini */}
-            <div className="bg-green-50 rounded-xl p-3 mb-3">
-              <div className="flex items-center gap-1 mb-2">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-green-600">
-                  <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 16a1 1 0 1 1 1-1 1 1 0 0 1-1 1zm1-5V7a1 1 0 0 0-2 0v6a1 1 0 0 0 2 0z" />
-                </svg>
-                <span className="text-[10px] font-bold text-gray-700">Nutrition & Vitamins</span>
+      {/* REMEDIES SECTION */}
+      {activeSection === "remedies" && (
+        <div>
+          <div className="relative mb-4">
+            <Search
+              size={18}
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              value={remedySymptom}
+              onChange={(e) => setRemedySymptom(e.target.value)}
+              placeholder="My head hurts, I feel tired, stomach ache..."
+              className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white border-2 border-gray-100 focus:border-green-400 outline-none font-medium text-sm shadow-sm"
+            />
+          </div>
+
+          {selectedRemedy ? (
+            <div className="bg-white rounded-3xl p-5 shadow-sm border border-gray-100 animate-fade-in">
+              <button
+                onClick={() => setSelectedRemedy(null)}
+                className="text-sm text-gray-500 mb-3"
+              >
+                ← Back to remedies
+              </button>
+              <h3 className="text-lg font-bold text-gray-900 mb-1">
+                {selectedRemedy.title}
+              </h3>
+              <p className="text-xs text-green-600 font-semibold mb-3">
+                For: {selectedRemedy.symptom}
+              </p>
+
+              <div className="bg-green-50 rounded-2xl p-4 mb-4">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  {selectedRemedy.benefit}
+                </p>
               </div>
-              <div className="flex gap-1">
-                {sampleRecipe.vitamins.slice(0, 4).map((v) => (
-                  <div key={v.name} className="flex-1 text-center bg-white rounded-lg p-1">
-                    <p className="text-[8px] font-bold text-gray-700">{v.amount}</p>
-                    <p className="text-[7px] text-gray-400">{v.name}</p>
+
+              <h4 className="text-sm font-bold text-gray-800 mb-2">
+                Ingredients
+              </h4>
+              <div className="space-y-2 mb-4">
+                {selectedRemedy.ingredients.map((ing: string, i: number) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 bg-gray-50 rounded-xl p-3"
+                  >
+                    <Leaf size={14} className="text-green-500" />
+                    <span className="text-sm text-gray-700">{ing}</span>
                   </div>
                 ))}
               </div>
-            </div>
 
-            <div className="bg-green-50 rounded-xl p-3">
-              <div className="flex items-start gap-2">
-                <span className="text-green-500">🌿</span>
-                <div>
-                  <p className="text-[10px] font-bold text-green-800 mb-0.5">Why this is good for you</p>
-                  <p className="text-[10px] text-green-700 leading-relaxed">
-                    Great source of potassium and magnesium which support muscle function and help maintain energy levels.
+              <h4 className="text-sm font-bold text-gray-800 mb-2">Steps</h4>
+              <div className="space-y-3 mb-4">
+                {selectedRemedy.steps.map((step: string, i: number) => (
+                  <div key={i} className="flex gap-3">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full bg-green-100 text-green-700 flex items-center justify-center text-xs font-bold">
+                      {i + 1}
+                    </span>
+                    <p className="text-sm text-gray-700">{step}</p>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex items-center gap-2 text-xs text-gray-500">
+                <Flame size={14} />
+                <span>Prep time: {selectedRemedy.prepTime}</span>
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredRemedies.map((remedy) => (
+                <button
+                  key={remedy.id}
+                  onClick={() => setSelectedRemedy(remedy)}
+                  className="w-full bg-white rounded-2xl p-4 shadow-sm text-left flex items-center gap-4"
+                >
+                  <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                    <Leaf size={20} className="text-green-500" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold text-gray-800">
+                      {remedy.title}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {remedy.symptom} · {remedy.prepTime}
+                    </p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TRAVEL SECTION */}
+      {activeSection === "travel" && (
+        <div className="space-y-4">
+          <p className="text-sm text-gray-500">
+            Local cuisine recommendations based on your taste profile
+          </p>
+          {TRAVEL_CUISINES.map((cuisine) => (
+            <div
+              key={cuisine.id}
+              className="bg-white rounded-3xl overflow-hidden shadow-sm border border-gray-100"
+            >
+              <img
+                src={cuisine.image}
+                alt={cuisine.dish}
+                className="w-full h-40 object-cover"
+              />
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-bold text-gray-400 uppercase">
+                    {cuisine.city}, {cuisine.country}
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  {cuisine.dish}
+                </h3>
+                <p className="text-sm text-gray-500 mb-3">
+                  {cuisine.description}
+                </p>
+                <div className="flex gap-2 mb-3">
+                  {cuisine.tags.map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-medium"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="bg-gray-50 rounded-xl p-3">
+                  <p className="text-xs text-gray-600">
+                    <span className="font-semibold">Why try:</span>{" "}
+                    {cuisine.whyTry}
                   </p>
                 </div>
               </div>
             </div>
-          </div>
+          ))}
         </div>
-      </div>
-
-      {/* Tip */}
-      <div className="px-4 mt-4">
-        <p className="text-xs text-gray-400 text-center">
-          💡 Tip: Be more specific with ingredients or preferences for better results!
-        </p>
-      </div>
+      )}
     </div>
   );
 }
