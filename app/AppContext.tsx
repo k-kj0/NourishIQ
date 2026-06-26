@@ -17,6 +17,7 @@ export type Meal = {
   steps: { step: number; text: string; time: string }[];
   substitutes: { ingredient: string; alternatives: string[] }[];
   benefits: string[];
+  rating?: "loved" | "okay" | "never" | null;
 };
 
 export type QuizState = {
@@ -49,6 +50,20 @@ export type UserProfile = {
   cookingTime: string;
   kitchenSetup: string[];
   lovedFoods: string[];
+  healthGoals: string[];
+  region: string;
+  age: number | null;
+  initials: string;
+  goal: string;
+  targetCalories: number;
+  currentWeight: number | null;
+  targetWeight: number | null;
+  weightUnit: string;
+};
+
+export type HydrationLog = {
+  glasses: number;
+  target: number;
 };
 
 type AppContextType = {
@@ -70,6 +85,11 @@ type AppContextType = {
   quizState: QuizState;
   updateQuizState: (updates: Partial<QuizState>) => void;
   setCurrentView: (v: "onboarding" | "dashboard") => void;
+  voiceMode: boolean;
+  setVoiceMode: (v: boolean) => void;
+  rateMeal: (mealId: string, rating: "loved" | "okay" | "never") => void;
+  hydrationLog: HydrationLog;
+  addWater: () => void;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -250,18 +270,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [phase, setPhase] = useState<"onboarding" | "dashboard">("onboarding");
   const [profile, setProfile] = useState<UserProfile>({
     name: "", gender: "", diet: [], healthConditions: [], cookingTime: "", kitchenSetup: [], lovedFoods: [],
+    healthGoals: [], region: "", age: null, initials: "ME", goal: "Eat Healthier", targetCalories: 2000,
+    currentWeight: null, targetWeight: null, weightUnit: "kg",
   });
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [showRecipeSheet, setShowRecipeSheet] = useState(false);
   const [favorites, setFavorites] = useState<Meal[]>([]);
-  const [activeTab, setActiveTab] = useState("home");
+  const [activeTab, setActiveTab] = useState("Home");
   const [quizStep, setQuizStep] = useState(1);
   const [quizState, setQuizState] = useState<QuizState>(defaultQuizState);
+  const [voiceMode, setVoiceMode] = useState(false);
+  const [hydrationLog, setHydrationLog] = useState<HydrationLog>({ glasses: 0, target: 8 });
   const totalQuizSteps = 16;
+
+  const addWater = () => {
+    setHydrationLog((prev) => ({ ...prev, glasses: Math.min(prev.glasses + 1, prev.target) }));
+  };
 
   const toggleLikeMeal = (meal: Meal) => {
     setFavorites((prev) =>
       prev.some((m) => m.id === meal.id) ? prev.filter((m) => m.id !== meal.id) : [...prev, meal]
+    );
+  };
+
+  const rateMeal = (mealId: string, rating: "loved" | "okay" | "never") => {
+    setSelectedMeal((prev) => (prev && prev.id === mealId ? { ...prev, rating } : prev));
+    setFavorites((prev) =>
+      prev.map((m) => (m.id === mealId ? { ...m, rating } : m))
     );
   };
 
@@ -277,6 +312,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       selectedMeal, setSelectedMeal, showRecipeSheet, setShowRecipeSheet,
       favorites, toggleLikeMeal, activeTab, setActiveTab,
       quizStep, setQuizStep, totalQuizSteps, quizState, updateQuizState, setCurrentView,
+      voiceMode, setVoiceMode, rateMeal,
+      hydrationLog, addWater,
     }}>
       {children}
     </AppContext.Provider>
