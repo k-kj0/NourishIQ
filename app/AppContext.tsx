@@ -66,6 +66,19 @@ export type HydrationLog = {
   target: number;
 };
 
+export type WeeklyGoal = {
+  id: string;
+  label: string;
+  target: number;
+  unit: string;
+  current: number;
+};
+
+export type GroceryItem = {
+  name: string;
+  checked: boolean;
+};
+
 type AppContextType = {
   phase: "onboarding" | "dashboard";
   setPhase: (p: "onboarding" | "dashboard") => void;
@@ -90,6 +103,13 @@ type AppContextType = {
   rateMeal: (mealId: string, rating: "loved" | "okay" | "never") => void;
   hydrationLog: HydrationLog;
   addWater: () => void;
+  weeklyGoal: WeeklyGoal;
+  setWeeklyGoal: (g: WeeklyGoal) => void;
+  logGoalProgress: (amount: number) => void;
+  groceryList: GroceryItem[];
+  toggleGroceryItem: (name: string) => void;
+  selectedDayIndex: number;
+  setSelectedDayIndex: (i: number) => void;
 };
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -281,10 +301,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [quizState, setQuizState] = useState<QuizState>(defaultQuizState);
   const [voiceMode, setVoiceMode] = useState(false);
   const [hydrationLog, setHydrationLog] = useState<HydrationLog>({ glasses: 0, target: 8 });
-  const totalQuizSteps = 16;
+  const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoal>({
+    id: "burn-500", label: "Burn 500 calories", target: 500, unit: "kcal", current: 120,
+  });
+  const [groceryList, setGroceryList] = useState<GroceryItem[]>(() => {
+    const names = new Set<string>();
+    MEALS.forEach((m) => m.ingredients.forEach((i) => names.add(i.split("(")[0].trim())));
+    return Array.from(names).map((name) => ({ name, checked: false }));
+  });
+  const [selectedDayIndex, setSelectedDayIndex] = useState(0);
+  const totalQuizSteps = 14;
 
   const addWater = () => {
     setHydrationLog((prev) => ({ ...prev, glasses: Math.min(prev.glasses + 1, prev.target) }));
+  };
+
+  const logGoalProgress = (amount: number) => {
+    setWeeklyGoal((prev) => ({ ...prev, current: Math.min(prev.current + amount, prev.target) }));
+  };
+
+  const toggleGroceryItem = (name: string) => {
+    setGroceryList((prev) => prev.map((g) => (g.name === name ? { ...g, checked: !g.checked } : g)));
   };
 
   const toggleLikeMeal = (meal: Meal) => {
@@ -314,6 +351,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       quizStep, setQuizStep, totalQuizSteps, quizState, updateQuizState, setCurrentView,
       voiceMode, setVoiceMode, rateMeal,
       hydrationLog, addWater,
+      weeklyGoal, setWeeklyGoal, logGoalProgress,
+      groceryList, toggleGroceryItem,
+      selectedDayIndex, setSelectedDayIndex,
     }}>
       {children}
     </AppContext.Provider>
