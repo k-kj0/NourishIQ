@@ -1,546 +1,601 @@
 "use client";
 
 import { useState } from "react";
-import { useApp, UserProfile } from "../AppContext";
-import { ChevronRight, ChevronLeft, User, Check } from "lucide-react";
+import { useApp } from "../AppContext";
+import { motion, AnimatePresence } from "framer-motion";
+import { KawaiiCharacter } from "./KawaiiCharacter";
+import { ChevronLeft, ChevronRight, Zap, Clock, ChefHat, Package, Sparkles, Heart, Star, ArrowRight, Check } from "lucide-react";
+import { REGIONS, DIET_TYPES, HEALTH_GOALS, HEALTH_CONDITIONS, FOOD_CATEGORIES, TEXTURE_DISLIKES, FLAVOR_DISLIKES, APPLIANCE_OPTIONS } from "../lib/mealData";
 
-const TOTAL_STEPS = 15;
-
-const GENDER_OPTIONS = [
-  { id: "male", label: "Male", emoji: "👨" },
-  { id: "female", label: "Female", emoji: "👩" },
-  { id: "nonbinary", label: "Non-binary", emoji: "🧑" },
-  { id: "other", label: "Other", emoji: "🌈" },
-  { id: "prefer-not", label: "Prefer not to say", emoji: "🤫" },
-];
-
-const DIET_OPTIONS = [
-  { id: "vegan", label: "Vegan", emoji: "🌱" },
-  { id: "vegetarian", label: "Vegetarian", emoji: "🥬" },
-  { id: "veg-eggs", label: "Vegetarian + Eggs", emoji: "🥚" },
-  { id: "non-veg", label: "Non-vegetarian", emoji: "🍗" },
-  { id: "no-beef", label: "No Beef", emoji: "🐄" },
-  { id: "no-pork", label: "No Pork", emoji: "🐷" },
-  { id: "no-dairy", label: "No Dairy", emoji: "🥛" },
-  { id: "pescatarian", label: "Pescatarian", emoji: "🐟" },
-];
-
-const HEALTH_CONDITIONS = ["None", "Diabetes", "High blood pressure", "PCOS/PCOD", "Thyroid condition", "Other"];
-
-const COOKING_TIMES = [
-  { id: "under-15", label: "Under 15 mins", sub: "Quick & easy", emoji: "⚡" },
-  { id: "15-30", label: "15–30 mins", sub: "Standard cooking", emoji: "🕐" },
-  { id: "30-60", label: "30–60 mins", sub: "Weekend cooking", emoji: "👨‍🍳" },
-  { id: "1-2hr", label: "1–2 hours", sub: "Special occasions", emoji: "🕐" },
-  { id: "meal-prep", label: "I meal prep once a week", sub: "Batch cooking", emoji: "📦" },
-];
-
-const KITCHEN_OPTIONS = [
-  { id: "none", label: "No special appliances", sub: "I keep it simple", emoji: "⊞" },
-  { id: "microwave", label: "Microwave", sub: "Quick & easy cooking", emoji: "📱" },
-  { id: "air-fryer", label: "Air Fryer", sub: "Crispy with less oil", emoji: "🫙" },
-  { id: "oven", label: "Oven", sub: "Baking & roasting", emoji: "🟡" },
-  { id: "toaster", label: "Toaster", sub: "For quick bites", emoji: "🍞" },
-  { id: "instant-pot", label: "Instant Pot", sub: "One-pot wonders", emoji: "🫕" },
-  { id: "slow-cooker", label: "Slow Cooker", sub: "Set it & forget it", emoji: "🍲" },
-  { id: "blender", label: "Blender", sub: "Smoothies & more", emoji: "🔮" },
-  { id: "food-processor", label: "Food Processor", sub: "Chop, slice, shred with ease", emoji: "⚙️" },
-];
-
-const FOOD_CATEGORIES: { category: string; emoji: string; items: string[] }[] = [
-  { category: "Meats", emoji: "🥩", items: ["Chicken", "Pork", "Beef", "Mutton", "Lamb"] },
-  { category: "Seafood", emoji: "🐟", items: ["Salmon", "Tuna", "Prawns", "Shrimp", "Crab"] },
-  { category: "Dairy", emoji: "🧀", items: ["Cheddar", "Parmesan", "Mozzarella", "Greek Yogurt", "Butter"] },
-  { category: "Vegan Dairy", emoji: "🌿", items: ["Almond Milk", "Oat Milk", "Soy Milk", "Tofu"] },
-  { category: "Vegetables", emoji: "🥦", items: ["Spinach", "Broccoli", "Carrots", "Tomatoes", "Bell Peppers"] },
-  { category: "Grains", emoji: "🌾", items: ["Rice", "Quinoa", "Oats", "Whole Wheat", "Barley"] },
-];
-
-const STEP_LABELS: Record<number, string> = {
-  1: "What should we call you?",
-  2: "How old are you?",
-  3: "How do you identify?",
-  4: "What's your current weight?",
-  5: "What's your diet?",
-  6: "Any food allergies?",
-  7: "Any health conditions?",
-  8: "What's your goal?",
-  9: "Foods you love",
-  10: "Foods you dislike?",
-  11: "How much time?",
-  12: "Budget per meal?",
-  13: "Your kitchen setup",
-  14: "Meal plan days?",
-  15: "Almost done! 🎉",
+const stepEmotions: Record<number, string> = {
+  1: "wave", 2: "happy", 3: "excited", 4: "love", 5: "thinking",
+  6: "chef", 7: "excited", 8: "thinking", 9: "surprised", 10: "eating",
+  11: "thinking", 12: "chef", 13: "happy", 14: "cool", 15: "dancing", 16: "love",
 };
 
+// Floating food decorations used on the welcome/name screens
+const FoodDecorations = () => (
+  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <img src="https://placehold.co/100x100/f0fdf4/22c55e?text=🥑" alt="" className="absolute top-4 left-2 w-16 h-16 opacity-90 object-cover rounded-full" style={{background:"transparent"}} />
+    <div className="absolute top-3 left-2 text-5xl select-none">🥑</div>
+    <div className="absolute top-4 right-4 text-4xl select-none">🍓</div>
+    <div className="absolute top-20 right-2 text-3xl select-none">🌿</div>
+    <div className="absolute bottom-40 right-3 text-4xl select-none opacity-70">🍲</div>
+    <div className="absolute bottom-52 left-3 text-3xl select-none opacity-60">🥦</div>
+  </div>
+);
+
 export function OnboardingQuiz() {
-  const { setPhase, setProfile } = useApp();
-  const [step, setStep] = useState(1);
-  const [name, setName] = useState("");
-  const [gender, setGender] = useState("");
-  const [diet, setDiet] = useState<string[]>([]);
-  const [conditions, setConditions] = useState<string[]>([]);
-  const [cookTime, setCookTime] = useState("");
-  const [kitchen, setKitchen] = useState<string[]>([]);
-  const [lovedFoods, setLovedFoods] = useState<string[]>([]);
-  const [planDays, setPlanDays] = useState(5);
-  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-    new Set(FOOD_CATEGORIES.map((c) => c.category))
+  const { quizStep, setQuizStep, totalQuizSteps, quizState, updateQuizState, setCurrentView } = useApp();
+  const [direction, setDirection] = useState(1);
+
+  const progress = ((quizStep - 1) / (totalQuizSteps - 1)) * 100;
+
+  const goNext = () => {
+    if (quizStep < totalQuizSteps) { setDirection(1); setQuizStep(quizStep + 1); }
+    else { setCurrentView("dashboard"); }
+  };
+  const goBack = () => {
+    if (quizStep > 1) { setDirection(-1); setQuizStep(quizStep - 1); }
+  };
+
+  const variants = {
+    enter: (dir: number) => ({ x: dir > 0 ? 300 : -300, opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (dir: number) => ({ x: dir > 0 ? -300 : 300, opacity: 0 }),
+  };
+
+  // ==================== WELCOME SCREEN ====================
+  const WelcomeStep = () => (
+    <div className="relative min-h-[100dvh] bg-[#f8f6f0] flex flex-col items-center justify-center overflow-hidden px-6">
+      <FoodDecorations />
+      {/* Logo */}
+      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="mb-8 relative z-10">
+        <h1 className="text-5xl font-black tracking-tight text-center">
+          <span className="text-[#1a472a]">Nourish</span><span className="text-[#f97316]">IQ</span>
+          <span className="text-[#22c55e] text-3xl ml-1">✦</span>
+        </h1>
+        <motion.div className="h-1 w-32 mx-auto mt-1 rounded-full bg-gradient-to-r from-[#22c55e] via-[#f97316] to-[#a855f7]"
+          initial={{ width: 0 }} animate={{ width: 128 }} transition={{ delay: 0.6, duration: 0.7 }} />
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.4 }} className="relative z-10 mb-6">
+        <KawaiiCharacter emotion="wave" size={100} />
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="text-center mb-8 relative z-10">
+        <h2 className="text-3xl font-black text-gray-900 mb-2">Smart meal planning,<br />made personal.</h2>
+        <p className="text-gray-400 text-base">15 quick questions to unlock your perfect meal plan ✨</p>
+      </motion.div>
+
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="flex gap-3 mb-8 relative z-10 flex-wrap justify-center">
+        {[{label:"500+ Recipes",color:"#22c55e",bg:"#dcfce7"},{label:"AI-Powered",color:"#a855f7",bg:"#f3e8ff"},{label:"100% Yours",color:"#f97316",bg:"#ffedd5"}].map(tag => (
+          <span key={tag.label} className="px-4 py-2 rounded-full text-sm font-bold" style={{backgroundColor: tag.bg, color: tag.color}}>{tag.label}</span>
+        ))}
+      </motion.div>
+
+      <motion.button initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.9 }}
+        whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} onClick={goNext}
+        className="w-full max-w-sm py-4 rounded-2xl text-white font-bold text-lg flex items-center justify-center gap-2 relative z-10"
+        style={{ background: "linear-gradient(135deg, #22c55e, #16a34a)", boxShadow: "0 8px 32px rgba(34,197,94,0.35)" }}>
+        Let&apos;s get started <ArrowRight className="w-5 h-5" />
+      </motion.button>
+      <p className="text-gray-400 text-sm mt-4 relative z-10">You can always change this later</p>
+    </div>
   );
 
-  const progress = (step / TOTAL_STEPS) * 100;
+  // ==================== QUIZ STEP SHELL ====================
+  const Shell = ({ title, subtitle, children }: { title: React.ReactNode; subtitle?: string; children: React.ReactNode }) => (
+    <div className="space-y-5 pb-4">
+      <div className="text-center">
+        <h2 className="text-2xl font-black text-gray-900 leading-snug">{title}</h2>
+        {subtitle && <p className="text-sm text-[#22c55e] font-medium mt-1">{subtitle}</p>}
+      </div>
+      {children}
+    </div>
+  );
 
-  const toggleArr = <T,>(arr: T[], item: T, setter: (v: T[]) => void) => {
-    setter(arr.includes(item) ? arr.filter((x) => x !== item) : [...arr, item]);
-  };
-
-  const toggleCategory = (cat: string) => {
-    setExpandedCategories((prev) => {
-      const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
-      return next;
-    });
-  };
-
-  const canContinue = () => {
-    if (step === 1) return name.trim().length > 0;
-    if (step === 3) return gender !== "";
-    if (step === 5) return diet.length > 0;
-    return true;
-  };
-
-  const handleContinue = () => {
-    // Persist name to context as soon as step 1 is completed
-    if (step === 1) {
-      setProfile({
-        name: name.trim(),
-        gender: "",
-        diet: [],
-        healthConditions: [],
-        cookingTime: "",
-        kitchenSetup: [],
-        lovedFoods: [],
-      });
-    }
-
-    if (step < TOTAL_STEPS) {
-      setStep(step + 1);
-    } else {
-      setProfile({
-        name: name.trim(),
-        gender,
-        diet,
-        healthConditions: conditions,
-        cookingTime: cookTime,
-        kitchenSetup: kitchen,
-        lovedFoods,
-      });
-      setPhase("dashboard");
-    }
-  };
-
-  const renderStep = () => {
-    // Step 1: Name
-    if (step === 1) {
-      return (
-        <div className="flex-1 flex flex-col items-center px-6 pt-4">
-          <div className="text-center mb-8">
-            <NourishLogo />
-            <h1 className="text-3xl font-bold text-gray-900 mt-6 mb-2">
-              What should we call <span className="text-orange-400">you?</span>
-            </h1>
-            <p className="text-gray-500 text-sm">We want to make this personal ✨</p>
-          </div>
-          <div className="w-full bg-white rounded-2xl flex items-center gap-3 px-4 py-4 shadow-sm border border-gray-100">
-            <User size={20} className="text-green-500" />
-            <input
-              type="text"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              className="flex-1 outline-none text-base text-gray-800 placeholder-gray-400 bg-transparent"
-            />
-          </div>
-        </div>
-      );
-    }
-
-    // Step 3: Gender
-    if (step === 3) {
-      return (
-        <div className="flex-1 px-5 pt-4">
-          <div className="text-center mb-6">
-            <NourishLogo />
-            <h2 className="text-2xl font-bold text-gray-900 mt-4 mb-1">How do you identify?</h2>
-            <p className="text-green-600 text-sm">Used for personalized meal planning only 🍃</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            {GENDER_OPTIONS.filter((g) => g.id !== "prefer-not").map((opt) => (
-              <button
-                key={opt.id}
-                onClick={() => setGender(opt.id)}
-                className={`relative flex flex-col items-center justify-center py-5 rounded-2xl border-2 transition-all ${
-                  gender === opt.id ? "bg-green-50 border-green-400" : "bg-white border-gray-100"
-                }`}
-              >
-                {gender === opt.id && (
-                  <span className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                    <Check size={12} color="white" />
-                  </span>
-                )}
-                <span className="text-3xl mb-2">{opt.emoji}</span>
-                <span className="text-sm font-semibold text-gray-800">{opt.label}</span>
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => setGender("prefer-not")}
-            className={`w-full flex flex-col items-center py-4 rounded-2xl border-2 transition-all ${
-              gender === "prefer-not" ? "bg-green-50 border-green-400" : "bg-white border-gray-100"
-            }`}
-          >
-            <span className="text-2xl mb-1">🤫</span>
-            <span className="text-sm font-semibold text-gray-800">Prefer not to say</span>
-          </button>
-        </div>
-      );
-    }
-
-    // Step 5: Diet
-    if (step === 5) {
-      return (
-        <div className="flex-1 px-5 pt-4">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">What&apos;s your diet?</h2>
-            <p className="text-gray-500 text-sm">Select all that apply — no judgment here!</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {DIET_OPTIONS.map((opt) => {
-              const sel = diet.includes(opt.id);
-              return (
-                <button
-                  key={opt.id}
-                  onClick={() => toggleArr(diet, opt.id, setDiet)}
-                  className={`relative flex items-center gap-3 p-4 rounded-2xl border-2 transition-all text-left ${
-                    sel ? "bg-green-50 border-green-400" : "bg-white border-gray-100"
-                  }`}
-                >
-                  {sel && (
-                    <span className="absolute top-2 right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
-                      <Check size={10} color="white" />
-                    </span>
-                  )}
-                  <span className="text-xl">{opt.emoji}</span>
-                  <span className="text-sm font-semibold text-gray-800">{opt.label}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // Step 7: Health Conditions
-    if (step === 7) {
-      return (
-        <div className="flex-1 px-5 pt-4">
-          <div className="mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-1">Any health conditions?</h2>
-            <p className="text-gray-500 text-sm">We&apos;ll tailor recipes to keep you safe &amp; healthy</p>
-          </div>
-          <div className="space-y-3">
-            {HEALTH_CONDITIONS.map((cond) => {
-              const sel = conditions.includes(cond);
-              return (
-                <button
-                  key={cond}
-                  onClick={() => {
-                    if (cond === "None") {
-                      setConditions(["None"]);
-                    } else {
-                      const without = conditions.filter((c) => c !== "None");
-                      toggleArr(without, cond, setConditions);
-                    }
-                  }}
-                  className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left ${
-                    sel ? "bg-green-50 border-green-400" : "bg-white border-gray-100"
-                  }`}
-                >
-                  <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center ${sel ? "bg-green-500 border-green-500" : "border-gray-300"}`}>
-                    {sel && <Check size={12} color="white" />}
-                  </div>
-                  <span className="text-sm font-medium text-gray-800">{cond}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // Step 9: Foods you love
-    if (step === 9) {
-      return (
-        <div className="flex-1 px-5 pt-2">
-          <div className="text-center mb-5">
-            <span className="text-4xl">🥑✨</span>
-            <h2 className="text-2xl font-bold text-gray-900 mt-2 mb-1">Foods you love</h2>
-            <p className="text-gray-500 text-sm">Select categories you enjoy most</p>
-          </div>
-          <div className="space-y-3">
-            {FOOD_CATEGORIES.map((cat) => {
-              const expanded = expandedCategories.has(cat.category);
-              return (
-                <div key={cat.category} className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                  <button
-                    onClick={() => toggleCategory(cat.category)}
-                    className="w-full flex items-center justify-between p-4"
-                  >
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl">{cat.emoji}</span>
-                      <div className="text-left">
-                        <p className="text-sm font-bold text-gray-900">{cat.category}</p>
-                        <p className="text-xs text-gray-400">{cat.items.join(", ")}</p>
-                      </div>
-                    </div>
-                    <span className="text-gray-400">{expanded ? "∧" : "∨"}</span>
-                  </button>
-                  {expanded && (
-                    <div className="px-4 pb-4 flex flex-wrap gap-2">
-                      {cat.items.map((item) => {
-                        const sel = lovedFoods.includes(item);
-                        return (
-                          <button
-                            key={item}
-                            onClick={() => toggleArr(lovedFoods, item, setLovedFoods)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-all ${
-                              sel
-                                ? "bg-green-500 border-green-500 text-white"
-                                : "bg-white border-gray-200 text-gray-700"
-                            }`}
-                          >
-                            {item}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // Step 11: Cooking Time
-    if (step === 11) {
-      return (
-        <div className="flex-1 px-5 pt-4">
-          <div className="text-center mb-6">
-            <span className="text-4xl">🕐</span>
-            <h2 className="text-2xl font-bold text-gray-900 mt-2 mb-1">How much time?</h2>
-            <p className="text-gray-500 text-sm">For cooking each meal 🍽️</p>
-          </div>
-          <div className="space-y-3 mb-5">
-            {COOKING_TIMES.map((opt) => (
-              <button
-                key={opt.id}
-                onClick={() => setCookTime(opt.id)}
-                className={`w-full flex items-center gap-4 p-4 rounded-2xl border-2 transition-all text-left ${
-                  cookTime === opt.id ? "bg-green-50 border-green-400" : "bg-white border-gray-100"
-                }`}
-              >
-                <div className="w-10 h-10 rounded-xl bg-gray-100 flex items-center justify-center text-xl">
-                  {opt.emoji}
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-bold text-gray-900">{opt.label}</p>
-                  <p className="text-xs text-gray-500">{opt.sub}</p>
-                </div>
-                <div className={`w-5 h-5 rounded-full border-2 ${cookTime === opt.id ? "bg-green-500 border-green-500" : "border-gray-300"}`}>
-                  {cookTime === opt.id && (
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="w-2 h-2 bg-white rounded-full" />
-                    </div>
-                  )}
-                </div>
-              </button>
-            ))}
-          </div>
-          <div className="bg-white rounded-2xl border border-gray-100 p-4">
-            <div className="flex items-center gap-2 mb-3">
-              <p className="text-sm font-bold text-gray-900">Custom meal planning</p>
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">Recommended</span>
-            </div>
-            <div className="flex gap-2">
-              {[3, 4, 5, 6, 7].map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setPlanDays(d)}
-                  className={`flex-1 py-2 rounded-xl text-sm font-bold transition-all ${
-                    planDays === d ? "bg-green-500 text-white" : "bg-gray-100 text-gray-600"
-                  }`}
-                >
-                  {d} days
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Step 13: Kitchen Setup
-    if (step === 13) {
-      return (
-        <div className="flex-1 px-5 pt-4">
-          <div className="text-center mb-5">
-            <span className="text-4xl">🍳</span>
-            <h2 className="text-2xl font-bold text-gray-900 mt-2 mb-1">Your kitchen setup</h2>
-            <p className="text-gray-500 text-sm">Select the appliances you have</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {KITCHEN_OPTIONS.map((opt) => {
-              const sel = kitchen.includes(opt.id);
-              return (
-                <button
-                  key={opt.id}
-                  onClick={() => toggleArr(kitchen, opt.id, setKitchen)}
-                  className={`relative flex items-start gap-3 p-4 rounded-2xl border-2 transition-all text-left ${
-                    sel ? "bg-green-50 border-green-400" : "bg-white border-gray-100"
-                  }`}
-                >
-                  <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center mt-0.5 ${sel ? "bg-green-500 border-green-500" : "border-gray-300"}`}>
-                    {sel && <Check size={10} color="white" />}
-                  </div>
-                  <div>
-                    <span className="text-xl block mb-1">{opt.emoji}</span>
-                    <p className="text-xs font-bold text-gray-900 leading-tight">{opt.label}</p>
-                    <p className="text-xs text-gray-400">{opt.sub}</p>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      );
-    }
-
-    // Step 15: Final
-    if (step === 15) {
-      return (
-        <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-          <div className="text-6xl mb-4">🎉</div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-2">You&apos;re all set, {name}!</h2>
-          <p className="text-gray-500 text-base mb-2">
-            We&apos;ve crafted a personalized nutrition plan just for you.
-          </p>
-          <p className="text-green-600 text-sm font-medium">Let&apos;s start your health journey 🌱</p>
-          <div className="mt-8 grid grid-cols-2 gap-4 w-full max-w-xs">
-            <div className="bg-green-50 rounded-2xl p-4 text-center">
-              <p className="text-2xl font-bold text-green-600">5</p>
-              <p className="text-xs text-gray-500">Meals/day</p>
-            </div>
-            <div className="bg-orange-50 rounded-2xl p-4 text-center">
-              <p className="text-2xl font-bold text-orange-500">{planDays}</p>
-              <p className="text-xs text-gray-500">Day plan</p>
-            </div>
-          </div>
-        </div>
-      );
-    }
-
-    // Generic steps (2, 4, 6, 8, 10, 12, 14)
-    return (
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
+  // ==================== STEPS ====================
+  const NameStep = () => (
+    <div className="relative min-h-[calc(100dvh-120px)] bg-[#f8f6f0] flex flex-col items-center justify-center px-4">
+      <FoodDecorations />
+      {/* Logo */}
+      <div className="relative z-10 mb-6 text-center">
+        <h1 className="text-4xl font-black"><span className="text-[#1a472a]">Nourish</span><span className="text-[#f97316]">IQ</span><span className="text-[#22c55e] text-2xl ml-1">✦</span></h1>
+        <div className="h-1 w-28 mx-auto mt-1 rounded-full bg-gradient-to-r from-[#22c55e] via-[#f97316] to-[#a855f7]" />
+      </div>
+      <div className="relative z-10 w-full max-w-sm space-y-6">
         <div className="text-center">
-          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-2xl">✨</span>
-          </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">{STEP_LABELS[step]}</h2>
-          <p className="text-gray-500 text-sm">We&apos;re personalizing your experience</p>
+          <h2 className="text-2xl font-black text-gray-900">What should<br />we call <span className="text-[#f97316]">you?</span></h2>
+          <p className="text-gray-400 text-sm mt-1">We want to make this personal ✨</p>
         </div>
-      </div>
-    );
-  };
-
-  return (
-    <div
-      className="min-h-screen flex flex-col relative overflow-hidden"
-      style={{ background: "linear-gradient(135deg, #f8fdf4 0%, #fefcf0 50%, #f8fdf4 100%)" }}
-    >
-      {/* Decorative food images on early steps */}
-      {step <= 3 && (
-        <>
-          <div className="absolute top-8 left-4 w-24 h-24 opacity-90 pointer-events-none">
-            <img src="https://images.unsplash.com/photo-1517282009859-f000ec3b26fe?w=200&q=80" alt="" className="w-full h-full object-cover rounded-full" />
-          </div>
-          <div className="absolute top-4 right-4 w-16 h-16 opacity-90 pointer-events-none">
-            <img src="https://images.unsplash.com/photo-1464965911861-746a04b4bca6?w=200&q=80" alt="" className="w-full h-full object-cover rounded-full" />
-          </div>
-          <div className="absolute top-1/3 right-2 w-20 h-20 opacity-80 pointer-events-none">
-            <img src="https://images.unsplash.com/photo-1476718406336-bb5a9690ee2a?w=200&q=80" alt="" className="w-20 h-20 object-cover rounded-full" />
-          </div>
-          <div className="absolute bottom-32 left-2 w-12 h-12 opacity-80 pointer-events-none rounded-full overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1567306226416-28f0efdc88ce?w=100&q=80" alt="" className="w-full h-full object-cover" />
-          </div>
-        </>
-      )}
-
-      {/* Progress bar */}
-      <div className="relative z-10 flex items-center gap-4 px-4 pt-4 pb-2">
-        <button
-          onClick={() => step > 1 && setStep(step - 1)}
-          className="w-9 h-9 rounded-full bg-white shadow-sm flex items-center justify-center"
-        >
-          <ChevronLeft size={18} className="text-gray-600" />
-        </button>
-        <div className="flex-1">
-          <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>{step} / {TOTAL_STEPS}</span>
-          </div>
-          <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-green-500 rounded-full transition-all duration-500"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
+        <div className="bg-white rounded-2xl px-4 py-3 flex items-center gap-3 shadow-sm border border-gray-100">
+          <span className="text-[#22c55e] text-xl">👤</span>
+          <input type="text" value={quizState.name} onChange={(e) => updateQuizState({ name: e.target.value })}
+            placeholder="Your name"
+            className="flex-1 text-base font-semibold outline-none bg-transparent text-gray-700 placeholder:text-gray-300" />
         </div>
-      </div>
-
-      {/* Step content */}
-      <div className="relative z-10 flex-1 overflow-y-auto pb-32">
-        {renderStep()}
-      </div>
-
-      {/* Continue button */}
-      <div className="fixed bottom-0 left-0 right-0 bg-transparent px-5 pb-6 pt-2 z-20">
-        <button
-          onClick={handleContinue}
-          disabled={!canContinue()}
-          className={`w-full py-4 rounded-2xl font-bold text-white text-base flex items-center justify-center gap-2 transition-all ${
-            canContinue()
-              ? "bg-green-500 hover:bg-green-600 shadow-lg shadow-green-200"
-              : "bg-gray-300"
-          }`}
-        >
-          {step === TOTAL_STEPS ? "Start My Journey 🚀" : "Continue"}
-          {step < TOTAL_STEPS && <ChevronRight size={20} />}
-        </button>
-        <p className="text-center text-xs text-gray-400 mt-2">You can always change this later</p>
+        <p className="text-center text-gray-400 text-xs">You can always change this later</p>
       </div>
     </div>
   );
-}
 
-function NourishLogo() {
+  const AgeStep = () => (
+    <Shell title="How old are you?" subtitle="Age helps us calculate your nutrition needs">
+      <div className="relative">
+        <input type="number" value={quizState.age || ""} onChange={(e) => updateQuizState({ age: parseInt(e.target.value) || null })}
+          placeholder="25"
+          className="w-full text-4xl font-black p-6 rounded-2xl border-2 border-gray-100 focus:border-green-400 outline-none bg-white text-center" />
+        <span className="absolute right-6 top-1/2 -translate-y-1/2 text-2xl">🎂</span>
+      </div>
+      {quizState.age && (
+        <p className="text-center text-gray-400 text-sm">
+          {quizState.age < 30 ? "Prime time for building healthy habits! 💪" : quizState.age < 50 ? "Perfect age to optimize your nutrition! 🌟" : "Age is just a number — let's get you feeling amazing! ✨"}
+        </p>
+      )}
+    </Shell>
+  );
+
+  const GenderStep = () => (
+    <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col items-center justify-center px-4">
+      <FoodDecorations />
+      <div className="relative z-10 w-full max-w-sm space-y-5">
+        {/* Logo small */}
+        <div className="text-center">
+          <span className="text-2xl font-black"><span className="text-[#1a472a]">Nourish</span><span className="text-[#f97316]">IQ</span></span>
+          <div className="h-0.5 w-20 mx-auto mt-0.5 rounded-full bg-gradient-to-r from-[#22c55e] to-[#f97316]" />
+        </div>
+        <div className="text-center">
+          <h2 className="text-2xl font-black text-gray-900">How do you identify?</h2>
+          <p className="text-[#22c55e] text-sm font-medium mt-1">Used for personalized meal planning only 🌿</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {[
+            { label: "Male", emoji: "🧑‍🦱", color: "#fef3c7" },
+            { label: "Female", emoji: "👩", color: "#fce7f3" },
+            { label: "Non-binary", emoji: "🧑", color: "#ede9fe" },
+            { label: "Other", emoji: "🌈", color: "#ecfdf5" },
+          ].map((g) => (
+            <button key={g.label} onClick={() => updateQuizState({ gender: g.label })}
+              className={`relative p-4 rounded-2xl flex flex-col items-center gap-2 border-2 transition-all font-bold text-sm ${
+                quizState.gender === g.label ? "border-[#22c55e] bg-[#f0fdf4]" : "border-transparent bg-white"}`}
+              style={{ background: quizState.gender === g.label ? undefined : g.color }}>
+              {quizState.gender === g.label && (
+                <span className="absolute top-2 right-2 bg-[#22c55e] rounded-full w-5 h-5 flex items-center justify-center">
+                  <Check className="w-3 h-3 text-white" />
+                </span>
+              )}
+              <span className="text-3xl">{g.emoji}</span>
+              <span className="text-gray-700">{g.label}</span>
+            </button>
+          ))}
+        </div>
+        <button onClick={() => updateQuizState({ gender: "Prefer not to say" })}
+          className={`w-full p-3 rounded-2xl border-2 transition-all font-bold text-sm flex items-center justify-center gap-2 ${
+            quizState.gender === "Prefer not to say" ? "border-[#22c55e] bg-[#f0fdf4]" : "border-transparent bg-white"}`}>
+          <span className="text-xl">🤫</span> Prefer not to say
+        </button>
+      </div>
+    </div>
+  );
+
+  const RegionStep = () => (
+    <Shell title="Where are you based?" subtitle="We'll customize recipes for your region 🌍">
+      <div className="space-y-2 max-h-[380px] overflow-y-auto">
+        {REGIONS.map((r) => (
+          <button key={r.code} onClick={() => updateQuizState({ region: r.name })}
+            className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all text-left ${
+              quizState.region === r.name ? "bg-[#22c55e] text-white" : "bg-white border border-gray-100 text-gray-700 hover:border-green-200"}`}>
+            <span className="text-2xl">{r.flag}</span>
+            <span className="flex-1">{r.name}</span>
+            {quizState.region === r.name && <Check className="w-5 h-5" />}
+          </button>
+        ))}
+      </div>
+    </Shell>
+  );
+
+  const DietStep = () => (
+    <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col items-center justify-center px-4">
+      <FoodDecorations />
+      <div className="relative z-10 w-full max-w-sm space-y-5">
+        <div className="text-center">
+          <h2 className="text-2xl font-black text-gray-900">What&apos;s your diet?</h2>
+          <p className="text-gray-400 text-sm mt-1">Select all that apply — no judgment here!</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {DIET_TYPES.slice(0, 8).map((d) => {
+            const icons: Record<string, string> = { vegan:"🌱", vegetarian:"🥬", "veg-eggs":"🥚", "non-veg":"🍗", "no-beef":"🐄", "no-pork":"🐷", "no-dairy":"🥛", pescatarian:"🐟" };
+            const isSelected = quizState.dietType.includes(d.id);
+            return (
+              <button key={d.id} onClick={() => {
+                const updated = quizState.dietType.includes(d.id) ? quizState.dietType.filter(x=>x!==d.id) : [...quizState.dietType, d.id];
+                updateQuizState({ dietType: updated });
+              }}
+                className={`relative flex items-center gap-2 p-3 rounded-2xl border-2 font-bold text-sm transition-all bg-white ${
+                  isSelected ? "border-[#22c55e] bg-[#f0fdf4]" : "border-transparent"}`}>
+                {isSelected && <span className="absolute top-1.5 right-1.5 bg-[#22c55e] rounded-full w-4 h-4 flex items-center justify-center"><Check className="w-2.5 h-2.5 text-white"/></span>}
+                <span className="text-xl">{icons[d.id] || "🍽️"}</span>
+                <span className="text-gray-700 text-xs leading-tight">{d.label}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  const GoalsStep = () => (
+    <Shell title="Health goals" subtitle="What are you working toward? 🎯">
+      <div className="flex flex-wrap gap-2">
+        {HEALTH_GOALS.map((g) => {
+          const sel = quizState.healthGoals.includes(g.id);
+          return (
+            <button key={g.id} onClick={() => {
+              const updated = sel ? quizState.healthGoals.filter(x=>x!==g.id) : [...quizState.healthGoals, g.id];
+              updateQuizState({ healthGoals: updated });
+            }}
+              className={`px-4 py-2.5 rounded-full font-bold text-sm border-2 transition-all ${sel ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-white border-gray-100 text-gray-700"}`}>
+              {g.label}
+            </button>
+          );
+        })}
+      </div>
+    </Shell>
+  );
+
+  const ConditionsStep = () => (
+    <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col items-center justify-center px-4">
+      <div className="relative z-10 w-full max-w-sm space-y-4">
+        <div className="text-center">
+          <h2 className="text-2xl font-black text-gray-900">Any health conditions?</h2>
+          <p className="text-gray-400 text-sm mt-1">We&apos;ll tailor recipes to keep you safe &amp; healthy</p>
+        </div>
+        <div className="space-y-2">
+          {HEALTH_CONDITIONS.map((c) => {
+            const sel = quizState.healthConditions.includes(c.id);
+            return (
+              <button key={c.id} onClick={() => {
+                let updated: string[];
+                if (c.id === "none") { updated = sel ? [] : ["none"]; }
+                else { updated = sel ? quizState.healthConditions.filter(x=>x!==c.id) : [...quizState.healthConditions.filter(x=>x!=="none"), c.id]; }
+                updateQuizState({ healthConditions: updated });
+              }}
+                className={`w-full flex items-center gap-3 p-4 rounded-2xl font-semibold text-sm transition-all border-2 ${
+                  sel ? "border-[#22c55e] bg-[#f0fdf4] text-gray-900" : "border-gray-100 bg-white text-gray-700"}`}>
+                <span className={`w-5 h-5 rounded flex items-center justify-center border-2 flex-shrink-0 transition-all ${sel ? "bg-[#22c55e] border-[#22c55e]" : "border-gray-300"}`}>
+                  {sel && <Check className="w-3 h-3 text-white" />}
+                </span>
+                {c.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  const MenstrualStep = () => {
+    const show = ["Female", "Non-binary", "Other"].includes(quizState.gender);
+    if (!show) { setTimeout(goNext, 100); return null; }
+    return (
+      <Shell title="Menstrual health" subtitle="Help us support your cycle with the right nutrition">
+        <div className="grid grid-cols-3 gap-3">
+          {["Yes","No","Prefer not to say"].map(opt => (
+            <button key={opt} onClick={() => updateQuizState({ hasMenstrualCycle: opt })}
+              className={`p-3 rounded-2xl font-bold text-sm border-2 transition-all ${quizState.hasMenstrualCycle===opt ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-white border-gray-100 text-gray-700"}`}>
+              {opt}
+            </button>
+          ))}
+        </div>
+        {quizState.hasMenstrualCycle==="Yes" && (
+          <motion.div initial={{opacity:0,height:0}} animate={{opacity:1,height:"auto"}} className="space-y-3 mt-2">
+            <p className="text-gray-500 font-medium text-sm">Current phase?</p>
+            <div className="space-y-2">
+              {["Menstrual (Day 1-5)","Follicular (Day 6-13)","Ovulatory (Day 14-16)","Luteal (Day 17-28)","Not sure"].map(phase => (
+                <button key={phase} onClick={() => updateQuizState({ menstrualPhase: phase })}
+                  className={`w-full text-left p-3 rounded-2xl font-bold text-sm border-2 transition-all ${quizState.menstrualPhase===phase ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-white border-gray-100"}`}>
+                  {phase}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </Shell>
+    );
+  };
+
+  const FoodsLoveStep = () => (
+    <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col justify-center px-4 py-6">
+      <div className="relative z-10 w-full max-w-sm mx-auto space-y-4">
+        <div className="text-center">
+          <div className="text-3xl mb-1">🍽️</div>
+          <h2 className="text-2xl font-black text-gray-900">Foods you love</h2>
+          <p className="text-gray-400 text-sm mt-1">Select categories you enjoy most</p>
+        </div>
+        <div className="space-y-4 max-h-[400px] overflow-y-auto">
+          {Object.entries(FOOD_CATEGORIES).slice(0,5).map(([cat, items]) => (
+            <div key={cat} className="bg-white rounded-2xl p-4">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="font-bold text-gray-800 text-sm">{cat}</h3>
+                <button className="text-gray-400 text-xs">▲</button>
+              </div>
+              <p className="text-gray-400 text-xs mb-3">{(items as string[]).slice(0,5).join(", ")}</p>
+              <div className="flex flex-wrap gap-2">
+                {(items as string[]).slice(0,5).map((item) => {
+                  const sel = quizState.lovedFoods.includes(item);
+                  return (
+                    <button key={item} onClick={() => {
+                      const updated = sel ? quizState.lovedFoods.filter(x=>x!==item) : [...quizState.lovedFoods, item];
+                      updateQuizState({ lovedFoods: updated });
+                    }}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${sel ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-gray-50 text-gray-600 border-gray-100"}`}>
+                      {item}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  const FoodsAvoidStep = () => (
+    <Shell title="What do you want to avoid?" subtitle="Textures, flavors, and foods you dislike">
+      <div className="space-y-5">
+        <div>
+          <h3 className="font-bold text-gray-700 mb-2 text-sm">🫠 Textures</h3>
+          <div className="flex flex-wrap gap-2">
+            {TEXTURE_DISLIKES.map(t => {
+              const sel = quizState.avoidedTextures.includes(t);
+              return <button key={t} onClick={() => updateQuizState({ avoidedTextures: sel ? quizState.avoidedTextures.filter(x=>x!==t) : [...quizState.avoidedTextures,t] })}
+                className={`px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all ${sel ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-white border-gray-100 text-gray-700"}`}>{t}</button>;
+            })}
+          </div>
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-700 mb-2 text-sm">👅 Flavors</h3>
+          <div className="flex flex-wrap gap-2">
+            {FLAVOR_DISLIKES.map(f => {
+              const sel = quizState.avoidedFlavors.includes(f);
+              return <button key={f} onClick={() => updateQuizState({ avoidedFlavors: sel ? quizState.avoidedFlavors.filter(x=>x!==f) : [...quizState.avoidedFlavors,f] })}
+                className={`px-3 py-2 rounded-xl text-sm font-bold border-2 transition-all ${sel ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-white border-gray-100 text-gray-700"}`}>{f}</button>;
+            })}
+          </div>
+        </div>
+      </div>
+    </Shell>
+  );
+
+  const CookingTimeStep = () => (
+    <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col items-center justify-center px-4">
+      <div className="relative z-10 w-full max-w-sm space-y-4">
+        <div className="text-center">
+          <div className="text-3xl mb-1">⏱️</div>
+          <h2 className="text-2xl font-black text-gray-900">How much time?</h2>
+          <p className="text-gray-400 text-sm mt-1">For cooking each meal ⏱️</p>
+        </div>
+        <div className="space-y-3">
+          {[
+            {id:"under-15",label:"Under 15 mins",icon:"⚡",desc:"Quick & easy",bg:"#fef9c3"},
+            {id:"15-30",label:"15–30 mins",icon:"🕐",desc:"Standard cooking",bg:"#fef3c7"},
+            {id:"30-60",label:"30–60 mins",icon:"👨‍🍳",desc:"Weekend cooking",bg:"#fee2e2"},
+            {id:"1-2-hours",label:"1–2 hours",icon:"🕐",desc:"Special occasions",bg:"#ede9fe"},
+            {id:"meal-prep",label:"I meal prep once a week",icon:"📦",desc:"Batch cooking",bg:"#dbeafe"},
+          ].map(opt => {
+            const sel = quizState.cookingTime === opt.id;
+            return (
+              <button key={opt.id} onClick={() => updateQuizState({ cookingTime: opt.id })}
+                className={`w-full flex items-center gap-4 p-4 rounded-2xl font-bold transition-all text-left border-2 ${sel ? "border-[#22c55e] bg-[#f0fdf4]" : "border-transparent bg-white"}`}>
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style={{background: opt.bg}}>{opt.icon}</div>
+                <div className="flex-1">
+                  <p className="font-bold text-gray-900 text-sm">{opt.label}</p>
+                  <p className="text-xs text-gray-400">{opt.desc}</p>
+                </div>
+                <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 transition-all ${sel ? "bg-[#22c55e] border-[#22c55e]" : "border-gray-300"}`}>
+                  {sel && <Check className="w-3 h-3 text-white m-auto mt-0.5" />}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  const TimingStep = () => (
+    <Shell title="Meal timing" subtitle="When do you usually eat? 🍽️">
+      <div className="space-y-3">
+        {[{key:"breakfast",label:"Breakfast",default:"08:00",emoji:"🌅"},{key:"lunch",label:"Lunch",default:"13:00",emoji:"☀️"},{key:"snack",label:"Snack",default:"16:00",emoji:"🍿"},{key:"dinner",label:"Dinner",default:"20:00",emoji:"🌙"}].map(meal => (
+          <div key={meal.key} className="flex items-center justify-between p-4 bg-white rounded-2xl border border-gray-100">
+            <div className="flex items-center gap-3"><span className="text-xl">{meal.emoji}</span><span className="font-bold text-gray-700">{meal.label}</span></div>
+            <input type="time" value={quizState.mealTimes[meal.key as keyof typeof quizState.mealTimes] || meal.default}
+              onChange={(e) => updateQuizState({ mealTimes: { ...quizState.mealTimes, [meal.key]: e.target.value } })}
+              className="bg-gray-50 rounded-xl px-3 py-2 font-bold text-sm border border-gray-100 outline-none" />
+          </div>
+        ))}
+      </div>
+      <div>
+        <p className="text-gray-500 font-medium mb-2 text-sm">How many full meals per day?</p>
+        <div className="flex gap-2">
+          {[1,2,3,4].map(n => (
+            <button key={n} onClick={() => updateQuizState({ mealsPerDay: n })}
+              className={`flex-1 p-3 rounded-xl font-bold border-2 transition-all ${quizState.mealsPerDay===n ? "bg-[#22c55e] text-white border-[#22c55e]" : "bg-white border-gray-100 text-gray-700"}`}>{n}</button>
+          ))}
+        </div>
+      </div>
+    </Shell>
+  );
+
+  const WeightStep = () => {
+    if (!quizState.healthGoals.includes("lose-weight")) { setTimeout(goNext, 100); return null; }
+    return (
+      <Shell title="Weight details" subtitle="Help us set realistic targets">
+        <div className="space-y-4">
+          <div>
+            <p className="text-gray-500 font-medium mb-2 text-sm">Current weight</p>
+            <div className="flex gap-2">
+              <input type="number" value={quizState.currentWeight||""} onChange={(e) => updateQuizState({ currentWeight: parseInt(e.target.value)||null })}
+                placeholder="0" className="flex-1 text-2xl font-black p-4 rounded-2xl border-2 border-gray-100 focus:border-green-400 outline-none text-center" />
+              <select value={quizState.weightUnit} onChange={(e) => updateQuizState({ weightUnit: e.target.value })}
+                className="bg-white border-2 border-gray-100 rounded-2xl px-4 font-bold text-lg outline-none">
+                <option value="kg">kg</option><option value="lbs">lbs</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <p className="text-gray-500 font-medium mb-2 text-sm">Target weight</p>
+            <input type="number" value={quizState.targetWeight||""} onChange={(e) => updateQuizState({ targetWeight: parseInt(e.target.value)||null })}
+              placeholder="0" className="w-full text-2xl font-black p-4 rounded-2xl border-2 border-gray-100 focus:border-green-400 outline-none text-center" />
+          </div>
+        </div>
+      </Shell>
+    );
+  };
+
+  const AppliancesStep = () => (
+    <div className="relative bg-[#f8f6f0] min-h-[calc(100dvh-120px)] flex flex-col items-center justify-center px-4">
+      <div className="relative z-10 w-full max-w-sm space-y-4">
+        <div className="text-center">
+          <div className="text-3xl mb-1">🍳</div>
+          <h2 className="text-2xl font-black text-gray-900">Your kitchen setup</h2>
+          <p className="text-gray-400 text-sm mt-1">Select the appliances you have</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {APPLIANCE_OPTIONS.map(a => {
+            const icons: Record<string,string> = {none:"⊞",microwave:"📡",airfryer:"🌪️",oven:"🔥",toaster:"🍞","instant-pot":"⚡","slow-cooker":"🐌",blender:"🌀","food-processor":"⚙️"};
+            const bgs: Record<string,string> = {none:"#f0fdf4",microwave:"#ede9fe",airfryer:"#fff7ed",oven:"#fef9c3",toaster:"#dcfce7","instant-pot":"#dbeafe","slow-cooker":"#fee2e2",blender:"#faf5ff","food-processor":"#ecfdf5"};
+            const sel = quizState.appliances.includes(a.id);
+            return (
+              <button key={a.id} onClick={() => {
+                const updated = sel ? quizState.appliances.filter(x=>x!==a.id) : [...quizState.appliances, a.id];
+                updateQuizState({ appliances: updated });
+              }}
+                className={`relative p-4 rounded-2xl border-2 font-bold text-sm flex flex-col items-center gap-1.5 transition-all ${sel ? "border-[#22c55e]" : "border-transparent"}`}
+                style={{background: sel ? "#f0fdf4" : (bgs[a.id]||"#fff")}}>
+                {sel && <span className="absolute top-2 right-2 bg-[#22c55e] rounded-full w-5 h-5 flex items-center justify-center"><Check className="w-3 h-3 text-white"/></span>}
+                <span className="text-2xl">{icons[a.id]||"🔥"}</span>
+                <span className="text-gray-800 text-xs leading-tight text-center">{a.name}</span>
+                {a.desc && <span className="text-gray-400 text-[10px] text-center">{a.desc}</span>}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+
+  const ConfirmStep = () => (
+    <div className="space-y-6 text-center py-4">
+      <motion.div initial={{scale:0}} animate={{scale:1}} transition={{type:"spring",stiffness:200,damping:15}}>
+        <KawaiiCharacter emotion="love" size={90} animate={false} />
+      </motion.div>
+      <h2 className="text-2xl font-black text-gray-900">All set, {quizState.name}! 🎉</h2>
+      <div className="flex flex-col items-center gap-3">
+        <div className="w-20 h-20 rounded-full flex items-center justify-center text-white font-bold text-2xl"
+          style={{background:"linear-gradient(135deg,#22c55e,#16a34a)"}}>
+          {quizState.name.slice(0,2).toUpperCase()}
+        </div>
+        <p className="font-bold text-lg">{quizState.name}</p>
+        <p className="text-gray-400 text-sm">{quizState.region} • {quizState.dietType[0] ? DIET_TYPES.find(dt=>dt.id===quizState.dietType[0])?.label : "No diet selected"}</p>
+      </div>
+      <div className="flex flex-wrap justify-center gap-2">
+        {quizState.healthGoals.map(g => (
+          <span key={g} className="px-3 py-1.5 rounded-full bg-orange-50 text-orange-600 text-sm font-bold border border-orange-100">
+            {HEALTH_GOALS.find(h=>h.id===g)?.label||g}
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+
+  const steps: Record<number, React.ReactNode> = {
+    1: <WelcomeStep />, 2: <NameStep />, 3: <AgeStep />, 4: <GenderStep />,
+    5: <RegionStep />, 6: <DietStep />, 7: <GoalsStep />, 8: <ConditionsStep />,
+    9: <MenstrualStep />, 10: <FoodsLoveStep />, 11: <FoodsAvoidStep />,
+    12: <CookingTimeStep />, 13: <TimingStep />, 14: <WeightStep />,
+    15: <AppliancesStep />, 16: <ConfirmStep />,
+  };
+
+  // Full-screen steps that handle their own layout
+  const fullScreenSteps = new Set([1,2,4,6,8,10,12,15]);
+
+  if (quizStep === 1) return <WelcomeStep />;
+
+  // Full-screen steps with their own background/layout
+  if (fullScreenSteps.has(quizStep)) {
+    return (
+      <div className="min-h-[100dvh] flex flex-col">
+        {/* Progress bar */}
+        <div className="px-5 pt-5 pb-2 absolute top-0 left-0 right-0 z-20">
+          <div className="flex items-center justify-between mb-2">
+            <button onClick={goBack} className="p-2 rounded-full bg-white/80 border border-gray-100 shadow-sm backdrop-blur-sm">
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
+            </button>
+            <span className="text-sm font-bold text-gray-500 bg-white/80 px-3 py-1 rounded-full backdrop-blur-sm">
+              {quizStep - 1} / {totalQuizSteps - 1}
+            </span>
+            <div className="w-10" />
+          </div>
+          <div className="w-full h-1.5 bg-white/60 rounded-full overflow-hidden backdrop-blur-sm">
+            <motion.div className="h-full rounded-full bg-[#22c55e]"
+              initial={{width:0}} animate={{width:`${progress}%`}} transition={{duration:0.4}} />
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div key={quizStep} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={{duration:0.3}} className="flex-1">
+            {steps[quizStep]}
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Bottom continue button */}
+        <div className="absolute bottom-0 left-0 right-0 px-5 pb-8 pt-4 bg-gradient-to-t from-white/90 to-transparent">
+          <button onClick={goNext}
+            className="w-full py-4 rounded-2xl text-white font-bold text-base flex items-center justify-center gap-2"
+            style={{background:"linear-gradient(135deg,#22c55e,#16a34a)",boxShadow:"0 8px 24px rgba(34,197,94,0.3)"}}>
+            {quizStep === totalQuizSteps ? "Get Started! 🚀" : "Continue"}
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Standard scrollable steps
   return (
-    <div className="flex items-center justify-center gap-0">
-      <span className="text-2xl font-black text-green-800">Nourish</span>
-      <span className="text-2xl font-black text-orange-400">IQ</span>
-      <span className="text-green-500 ml-0.5">🌿</span>
+    <div className="min-h-[100dvh] bg-white flex flex-col">
+      <div className="px-5 pt-5 pb-2">
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={goBack} className="p-2.5 rounded-full bg-gray-50 border border-gray-100">
+            <ChevronLeft className="w-5 h-5 text-gray-600" />
+          </button>
+          <span className="text-sm font-bold text-gray-400">{quizStep - 1} / {totalQuizSteps - 1}</span>
+          <div className="w-10" />
+        </div>
+        <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
+          <motion.div className="h-full rounded-full bg-[#22c55e]"
+            initial={{width:0}} animate={{width:`${progress}%`}} transition={{duration:0.4}} />
+        </div>
+      </div>
+
+      <div className="flex-1 px-5 py-4 overflow-y-auto">
+        <AnimatePresence mode="wait" custom={direction}>
+          <motion.div key={quizStep} custom={direction} variants={variants} initial="enter" animate="center" exit="exit" transition={{duration:0.3}}>
+            {steps[quizStep] || steps[1]}
+          </motion.div>
+        </AnimatePresence>
+      </div>
+
+      <div className="px-5 pb-8 pt-2">
+        <button onClick={goNext}
+          className="w-full py-4 rounded-2xl text-white font-bold text-base flex items-center justify-center gap-2"
+          style={{background:"linear-gradient(135deg,#22c55e,#16a34a)",boxShadow:"0 8px 24px rgba(34,197,94,0.3)"}}>
+          {quizStep === totalQuizSteps ? "Get Started! 🚀" : "Continue →"}
+        </button>
+      </div>
     </div>
   );
 }
