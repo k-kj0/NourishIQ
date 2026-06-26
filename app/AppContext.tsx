@@ -211,4 +211,32 @@ export const MEALS: Meal[] = [
   {
     id: "lemon-mint-water",
     name: "Lemon Mint Water",
+    category: "BEVERAGE",
+    image: "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=800&q=80",
+    cookTime: "2 min",
+    servings: 2,
+    calories: 10,
+    protein: 0,
+    carbs: 3,
+    fat: 0,
+    ingredients: [
+      "Water (500ml)",
+      "Lemon, sliced (1/2)",
+      "Fresh Mint Leaves (6-8)",
+      "Ice Cubes (as needed)",
+    ],
+    steps: [
+      { step: 1, text: "Combine. Add lemon slices and mint leaves to a pitcher.", time: "1 min" },
+      { step: 2, text: "Pour water over and add ice. Let infuse for 5 minutes before serving.", time: "5 min" },
+    ],
+    substitutes: [
+      { ingredient: "Lemon", alternatives: ["Lime", "Orange", "Cucumber"] },
+      { ingredient: "Mint", alternatives: ["Basil", "Rosemary", "Ginger"] },
+    ],
+    benefits: [
+      "Hydrating and refreshing, supports digestion",
+      "Lemon adds Vitamin C and aids detoxification",
+      "Mint soothes the digestive system",
+    ],
+  },
     category:
