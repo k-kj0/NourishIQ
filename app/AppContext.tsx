@@ -1,3 +1,79 @@
+"use client";
+
+import React, { createContext, useContext, useState, ReactNode } from "react";
+
+export type Meal = {
+  id: string;
+  name: string;
+  category: string;
+  image: string;
+  cookTime: string;
+  servings: number;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  ingredients: string[];
+  steps: { step: number; text: string; time: string }[];
+  substitutes: { ingredient: string; alternatives: string[] }[];
+  benefits: string[];
+};
+
+export type QuizState = {
+  name: string;
+  age: number | null;
+  gender: string;
+  region: string;
+  dietType: string[];
+  healthGoals: string[];
+  healthConditions: string[];
+  hasMenstrualCycle: string;
+  menstrualPhase: string;
+  lovedFoods: string[];
+  avoidedTextures: string[];
+  avoidedFlavors: string[];
+  cookingTime: string;
+  mealTimes: { breakfast: string; lunch: string; snack: string; dinner: string };
+  mealsPerDay: number;
+  currentWeight: number | null;
+  targetWeight: number | null;
+  weightUnit: string;
+  appliances: string[];
+};
+
+export type UserProfile = {
+  name: string;
+  gender: string;
+  diet: string[];
+  healthConditions: string[];
+  cookingTime: string;
+  kitchenSetup: string[];
+  lovedFoods: string[];
+};
+
+type AppContextType = {
+  phase: "onboarding" | "dashboard";
+  setPhase: (p: "onboarding" | "dashboard") => void;
+  profile: UserProfile;
+  setProfile: (p: UserProfile) => void;
+  selectedMeal: Meal | null;
+  setSelectedMeal: (m: Meal | null) => void;
+  showRecipeSheet: boolean;
+  setShowRecipeSheet: (v: boolean) => void;
+  favorites: Meal[];
+  toggleLikeMeal: (m: Meal) => void;
+  activeTab: string;
+  setActiveTab: (t: string) => void;
+  quizStep: number;
+  setQuizStep: (s: number) => void;
+  totalQuizSteps: number;
+  quizState: QuizState;
+  updateQuizState: (updates: Partial<QuizState>) => void;
+  setCurrentView: (v: "onboarding" | "dashboard") => void;
+};
+
+const AppContext = createContext<AppContextType | null>(null);
+
 export const MEALS: Meal[] = [
   {
     id: "shakshuka",
@@ -18,11 +94,11 @@ export const MEALS: Meal[] = [
       "Feta Cheese (1/4 cup)", "Fresh Parsley or Cilantro (for garnish)",
     ],
     steps: [
-      { step: 1, text: "Sauté Aromatics. Heat olive oil in a skillet over medium heat. Add chopped onions and sauté until soft (about 3–4 mins). Add garlic and cook for another 30 seconds.", time: "4 min" },
-      { step: 2, text: "Add Vegetables. Add chopped red bell pepper and cook for 4–5 minutes until slightly softened.", time: "5 min" },
-      { step: 3, text: "Build the Sauce. Add crushed tomatoes, tomato paste, cumin, paprika, chili flakes, salt, and pepper. Stir well and let it simmer for 8–10 minutes.", time: "10 min" },
-      { step: 4, text: "Create Wells & Add Eggs. Make 2 small wells in the sauce. Crack an egg into each well. Cover and cook for 5–7 minutes until eggs are set to your liking.", time: "7 min" },
-      { step: 5, text: "Add Feta & Garnish. Sprinkle crumbled feta over the top. Cover for 1–2 minutes until warm. Garnish with fresh parsley or cilantro.", time: "2 min" },
+      { step: 1, text: "Sauté Aromatics. Heat olive oil in a skillet over medium heat. Add chopped onions and sauté until soft (about 3-4 mins). Add garlic and cook for another 30 seconds.", time: "4 min" },
+      { step: 2, text: "Add Vegetables. Add chopped red bell pepper and cook for 4-5 minutes until slightly softened.", time: "5 min" },
+      { step: 3, text: "Build the Sauce. Add crushed tomatoes, tomato paste, cumin, paprika, chili flakes, salt, and pepper. Stir well and simmer for 8-10 minutes.", time: "10 min" },
+      { step: 4, text: "Create Wells & Add Eggs. Make 2 small wells in the sauce. Crack an egg into each well. Cover and cook for 5-7 minutes until eggs are set to your liking.", time: "7 min" },
+      { step: 5, text: "Add Feta & Garnish. Sprinkle crumbled feta over the top. Cover for 1-2 minutes until warm. Garnish with fresh parsley or cilantro.", time: "2 min" },
       { step: 6, text: "Serve & Enjoy. Serve hot with whole grain toast, pita, or a side salad.", time: "" },
     ],
     substitutes: [
@@ -31,7 +107,7 @@ export const MEALS: Meal[] = [
       { ingredient: "Canned Tomatoes", alternatives: ["Fresh tomatoes", "Passata"] },
     ],
     benefits: [
-      "High in lycopene from tomatoes — supports heart health",
+      "High in lycopene from tomatoes - supports heart health",
       "Eggs provide complete protein and essential B vitamins",
       "Bell peppers are rich in Vitamin C and antioxidants",
     ],
@@ -55,7 +131,7 @@ export const MEALS: Meal[] = [
     ],
     steps: [
       { step: 1, text: "Marinate Chicken. Mix lemon juice, olive oil, garlic, thyme, rosemary, salt and pepper. Coat chicken and marinate for 15 mins.", time: "15 min" },
-      { step: 2, text: "Cook Chicken. Grill or pan-fry chicken for 6–7 mins per side until cooked through. Rest for 5 minutes then slice.", time: "15 min" },
+      { step: 2, text: "Cook Chicken. Grill or pan-fry chicken for 6-7 mins per side until cooked through. Rest for 5 minutes then slice.", time: "15 min" },
       { step: 3, text: "Assemble Bowl. Add rice as the base, top with greens, tomatoes, and cucumber.", time: "3 min" },
       { step: 4, text: "Top & Serve. Lay sliced chicken on top. Drizzle with extra lemon juice and olive oil.", time: "2 min" },
     ],
@@ -87,8 +163,8 @@ export const MEALS: Meal[] = [
     ],
     steps: [
       { step: 1, text: "Prep. Preheat grill to medium-high. Brush salmon and veggies with olive oil, garlic, salt, and pepper.", time: "5 min" },
-      { step: 2, text: "Grill Veggies. Grill asparagus, zucchini, and peppers for 4–5 mins turning once.", time: "5 min" },
-      { step: 3, text: "Grill Salmon. Place salmon skin-side down. Grill 4–5 mins per side until flaky.", time: "10 min" },
+      { step: 2, text: "Grill Veggies. Grill asparagus, zucchini, and peppers for 4-5 mins turning once.", time: "5 min" },
+      { step: 3, text: "Grill Salmon. Place salmon skin-side down. Grill 4-5 mins per side until flaky.", time: "10 min" },
       { step: 4, text: "Finish. Squeeze lemon over everything, garnish with fresh dill and serve.", time: "2 min" },
     ],
     substitutes: [
@@ -161,3 +237,54 @@ export const MEALS: Meal[] = [
     ],
   },
 ];
+
+const defaultQuizState: QuizState = {
+  name: "", age: null, gender: "", region: "", dietType: [],
+  healthGoals: [], healthConditions: [], hasMenstrualCycle: "",
+  menstrualPhase: "", lovedFoods: [], avoidedTextures: [], avoidedFlavors: [],
+  cookingTime: "", mealTimes: { breakfast: "08:00", lunch: "13:00", snack: "16:00", dinner: "20:00" },
+  mealsPerDay: 3, currentWeight: null, targetWeight: null, weightUnit: "kg", appliances: [],
+};
+
+export function AppProvider({ children }: { children: ReactNode }) {
+  const [phase, setPhase] = useState<"onboarding" | "dashboard">("onboarding");
+  const [profile, setProfile] = useState<UserProfile>({
+    name: "", gender: "", diet: [], healthConditions: [], cookingTime: "", kitchenSetup: [], lovedFoods: [],
+  });
+  const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+  const [showRecipeSheet, setShowRecipeSheet] = useState(false);
+  const [favorites, setFavorites] = useState<Meal[]>([]);
+  const [activeTab, setActiveTab] = useState("home");
+  const [quizStep, setQuizStep] = useState(1);
+  const [quizState, setQuizState] = useState<QuizState>(defaultQuizState);
+  const totalQuizSteps = 16;
+
+  const toggleLikeMeal = (meal: Meal) => {
+    setFavorites((prev) =>
+      prev.some((m) => m.id === meal.id) ? prev.filter((m) => m.id !== meal.id) : [...prev, meal]
+    );
+  };
+
+  const updateQuizState = (updates: Partial<QuizState>) => {
+    setQuizState((prev) => ({ ...prev, ...updates }));
+  };
+
+  const setCurrentView = (v: "onboarding" | "dashboard") => setPhase(v);
+
+  return (
+    <AppContext.Provider value={{
+      phase, setPhase, profile, setProfile,
+      selectedMeal, setSelectedMeal, showRecipeSheet, setShowRecipeSheet,
+      favorites, toggleLikeMeal, activeTab, setActiveTab,
+      quizStep, setQuizStep, totalQuizSteps, quizState, updateQuizState, setCurrentView,
+    }}>
+      {children}
+    </AppContext.Provider>
+  );
+}
+
+export function useApp() {
+  const ctx = useContext(AppContext);
+  if (!ctx) throw new Error("useApp must be used within AppProvider");
+  return ctx;
+}
