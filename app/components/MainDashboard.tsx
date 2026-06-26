@@ -2,6 +2,10 @@
 
 import { useApp, MEALS, Meal } from "../AppContext";
 import { Bell, ChevronDown, ChevronLeft, ChevronRight, Volume2, Heart, Home, Compass, Refrigerator, Star } from "lucide-react";
+import { ExploreTab } from "../sections/ExploreTab";
+import { FridgeTab } from "../sections/FridgeTab";
+import { FavoritesTab } from "../sections/FavoritesTab";
+import { ProfileTab } from "../sections/ProfileTab";
 
 const DAYS = [
   { day: "MON", date: 22 },
@@ -127,105 +131,114 @@ export function MainDashboard() {
     <div className="min-h-screen bg-white flex flex-col max-w-md mx-auto relative">
       <div className="flex-1 overflow-y-auto pb-20">
 
-        {/* Header */}
-        <div className="px-4 pt-5 pb-2">
-          <div className="flex items-center justify-between mb-1">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Hey, {userName} 👋</h1>
-              <p className="text-sm text-gray-500">Fuel right. Feel good. Crush your goals. <span className="text-purple-500">✦</span></p>
-            </div>
-            <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center relative">
-              <Bell size={20} className="text-gray-700" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
-            </button>
-          </div>
-        </div>
-
-        {/* Date & nutrients */}
-        <div className="px-4 mb-4">
-          <button className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-3">
-            📅 Thursday, June 25
-            <ChevronDown size={16} className="text-gray-400" />
-          </button>
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-            {NUTRIENTS.map((n) => (
-              <div key={n.name} className="flex-shrink-0 bg-white border border-gray-100 rounded-2xl p-3 min-w-[80px] shadow-sm">
-                <div className="flex items-center gap-1 mb-1">
-                  <span className="text-xs">{n.icon}</span>
-                  <span className="text-xs text-gray-500 font-medium">{n.name}</span>
+        {activeTab === "Home" && (
+          <>
+            {/* Header */}
+            <div className="px-4 pt-5 pb-2">
+              <div className="flex items-center justify-between mb-1">
+                <div>
+                  <h1 className="text-2xl font-bold text-gray-900">Hey, {userName} 👋</h1>
+                  <p className="text-sm text-gray-500">Fuel right. Feel good. Crush your goals. <span className="text-purple-500">✦</span></p>
                 </div>
-                <p className="text-base font-bold text-gray-900">{n.val}</p>
-                <p className="text-xs text-gray-400">{n.unit}</p>
-                <div className="mt-2 h-1 rounded-full bg-gray-100">
-                  <div className="h-full rounded-full w-2/3" style={{ background: n.color }} />
-                </div>
+                <button className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center relative">
+                  <Bell size={20} className="text-gray-700" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full" />
+                </button>
               </div>
-            ))}
-          </div>
-        </div>
+            </div>
 
-        {/* Calendar */}
-        <div className="px-4 mb-4">
-          <div className="flex items-center justify-between">
-            <button className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
-              <ChevronLeft size={14} className="text-gray-600" />
-            </button>
-            <div className="flex gap-2">
-              {DAYS.map((d) => {
-                const isToday = d.date === 25;
-                return (
-                  <div key={d.date} className={`flex flex-col items-center px-2 py-2 rounded-2xl transition-all ${isToday ? "bg-green-500 text-white" : "text-gray-500"}`}>
-                    <span className="text-xs font-medium">{d.day}</span>
-                    <span className={`text-sm font-bold ${isToday ? "text-white" : "text-gray-800"}`}>{d.date}</span>
-                    {isToday && <span className="w-1.5 h-1.5 rounded-full bg-white mt-0.5" />}
+            {/* Date & nutrients */}
+            <div className="px-4 mb-4">
+              <button className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-3">
+                📅 Thursday, June 25
+                <ChevronDown size={16} className="text-gray-400" />
+              </button>
+              <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+                {NUTRIENTS.map((n) => (
+                  <div key={n.name} className="flex-shrink-0 bg-white border border-gray-100 rounded-2xl p-3 min-w-[80px] shadow-sm">
+                    <div className="flex items-center gap-1 mb-1">
+                      <span className="text-xs">{n.icon}</span>
+                      <span className="text-xs text-gray-500 font-medium">{n.name}</span>
+                    </div>
+                    <p className="text-base font-bold text-gray-900">{n.val}</p>
+                    <p className="text-xs text-gray-400">{n.unit}</p>
+                    <div className="mt-2 h-1 rounded-full bg-gray-100">
+                      <div className="h-full rounded-full w-2/3" style={{ background: n.color }} />
+                    </div>
                   </div>
-                );
-              })}
-            </div>
-            <button className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
-              <ChevronRight size={14} className="text-gray-600" />
-            </button>
-          </div>
-        </div>
-
-        {/* Meal list */}
-        <div className="px-4">
-          <div className="divide-y divide-gray-50">
-            {MEALS.map((meal) => (
-              <MealRow key={meal.id} meal={meal} />
-            ))}
-          </div>
-        </div>
-
-        {/* Sleep & nutrients card */}
-        <div className="mx-4 mt-4 bg-gradient-to-br from-indigo-900 to-purple-900 rounded-3xl p-5 text-white mb-4">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="text-3xl">🌙</div>
-            <div>
-              <p className="font-bold text-base">Nutrients that can support better sleep &amp; weight loss</p>
-              <p className="text-indigo-200 text-xs mt-1">Based on medical research</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-5 gap-2">
-            {[
-              { icon: "🟣", name: "Magnesium", desc: "Regulates hormones & improves sleep" },
-              { icon: "🌿", name: "Zinc", desc: "Promotes better deep sleep" },
-              { icon: "💙", name: "Calcium", desc: "Supports melatonin production" },
-              { icon: "☀️", name: "Vitamin D", desc: "Improves sleep quality & mood" },
-              { icon: "🔴", name: "Iron", desc: "Improves sleep, helps reduce fatigue" },
-            ].map((n) => (
-              <div key={n.name} className="text-center">
-                <span className="text-2xl block mb-1">{n.icon}</span>
-                <p className="text-xs font-bold text-white">{n.name}</p>
-                <p className="text-xs text-indigo-200 leading-tight mt-0.5">{n.desc}</p>
+                ))}
               </div>
-            ))}
-          </div>
-          <p className="text-xs text-indigo-200 mt-4 leading-relaxed">
-            A balanced diet with these nutrients, regular workouts &amp; quality sleep can help you{" "}
-            <span className="text-green-300 underline">improve sleep and lose weight.</span>
-          </p>
-        </div>
+            </div>
+
+            {/* Calendar */}
+            <div className="px-4 mb-4">
+              <div className="flex items-center justify-between">
+                <button className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+                  <ChevronLeft size={14} className="text-gray-600" />
+                </button>
+                <div className="flex gap-2">
+                  {DAYS.map((d) => {
+                    const isToday = d.date === 25;
+                    return (
+                      <div key={d.date} className={`flex flex-col items-center px-2 py-2 rounded-2xl transition-all ${isToday ? "bg-green-500 text-white" : "text-gray-500"}`}>
+                        <span className="text-xs font-medium">{d.day}</span>
+                        <span className={`text-sm font-bold ${isToday ? "text-white" : "text-gray-800"}`}>{d.date}</span>
+                        {isToday && <span className="w-1.5 h-1.5 rounded-full bg-white mt-0.5" />}
+                      </div>
+                    );
+                  })}
+                </div>
+                <button className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center">
+                  <ChevronRight size={14} className="text-gray-600" />
+                </button>
+              </div>
+            </div>
+
+            {/* Meal list */}
+            <div className="px-4">
+              <div className="divide-y divide-gray-50">
+                {MEALS.map((meal) => (
+                  <MealRow key={meal.id} meal={meal} />
+                ))}
+              </div>
+            </div>
+
+            {/* Sleep & nutrients card */}
+            <div className="mx-4 mt-4 bg-gradient-to-br from-indigo-900 to-purple-900 rounded-3xl p-5 text-white mb-4">
+              <div className="flex items-start gap-3 mb-4">
+                <div className="text-3xl">🌙</div>
+                <div>
+                  <p className="font-bold text-base">Nutrients that can support better sleep &amp; weight loss</p>
+                  <p className="text-indigo-200 text-xs mt-1">Based on medical research</p>
+                </div>
+              </div>
+              <div className="grid grid-cols-5 gap-2">
+                {[
+                  { icon: "🟣", name: "Magnesium", desc: "Regulates hormones & improves sleep" },
+                  { icon: "🌿", name: "Zinc", desc: "Promotes better deep sleep" },
+                  { icon: "💙", name: "Calcium", desc: "Supports melatonin production" },
+                  { icon: "☀️", name: "Vitamin D", desc: "Improves sleep quality & mood" },
+                  { icon: "🔴", name: "Iron", desc: "Improves sleep, helps reduce fatigue" },
+                ].map((n) => (
+                  <div key={n.name} className="text-center">
+                    <span className="text-2xl block mb-1">{n.icon}</span>
+                    <p className="text-xs font-bold text-white">{n.name}</p>
+                    <p className="text-xs text-indigo-200 leading-tight mt-0.5">{n.desc}</p>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-indigo-200 mt-4 leading-relaxed">
+                A balanced diet with these nutrients, regular workouts &amp; quality sleep can help you{" "}
+                <span className="text-green-300 underline">improve sleep and lose weight.</span>
+              </p>
+            </div>
+          </>
+        )}
+
+        {activeTab === "Explore" && <ExploreTab />}
+        {activeTab === "Fridge" && <FridgeTab />}
+        {activeTab === "Favorites" && <FavoritesTab />}
+        {activeTab === "Me" && <ProfileTab />}
       </div>
 
       {/* Bottom nav */}
