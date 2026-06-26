@@ -1,80 +1,3 @@
-"use client";
-
-import React, { createContext, useContext, useState, ReactNode } from "react";
-
-export type Meal = {
-  id: string;
-  name: string;
-  category: string;
-  image: string;
-  cookTime: string;
-  servings: number;
-  calories: number;
-  protein: number;
-  carbs: number;
-  fat: number;
-  ingredients: string[];
-  steps: { step: number; text: string; time: string }[];
-  substitutes: { ingredient: string; alternatives: string[] }[];
-  benefits: string[];
-};
-
-export type QuizState = {
-  name: string;
-  age: number | null;
-  gender: string;
-  region: string;
-  dietType: string[];
-  healthGoals: string[];
-  healthConditions: string[];
-  hasMenstrualCycle: string;
-  menstrualPhase: string;
-  lovedFoods: string[];
-  avoidedTextures: string[];
-  avoidedFlavors: string[];
-  cookingTime: string;
-  mealTimes: { breakfast: string; lunch: string; snack: string; dinner: string };
-  mealsPerDay: number;
-  currentWeight: number | null;
-  targetWeight: number | null;
-  weightUnit: string;
-  appliances: string[];
-};
-
-export type UserProfile = {
-  name: string;
-  gender: string;
-  diet: string[];
-  healthConditions: string[];
-  cookingTime: string;
-  kitchenSetup: string[];
-  lovedFoods: string[];
-};
-
-type AppContextType = {
-  phase: "onboarding" | "dashboard";
-  setPhase: (p: "onboarding" | "dashboard") => void;
-  profile: UserProfile;
-  setProfile: (p: UserProfile) => void;
-  selectedMeal: Meal | null;
-  setSelectedMeal: (m: Meal | null) => void;
-  showRecipeSheet: boolean;
-  setShowRecipeSheet: (v: boolean) => void;
-  favorites: Meal[];
-  toggleLikeMeal: (m: Meal) => void;
-  activeTab: string;
-  setActiveTab: (t: string) => void;
-  // Quiz
-  quizStep: number;
-  setQuizStep: (s: number) => void;
-  totalQuizSteps: number;
-  quizState: QuizState;
-  updateQuizState: (updates: Partial<QuizState>) => void;
-  setCurrentView: (v: "onboarding" | "dashboard") => void;
-};
-
-const AppContext = createContext<AppContextType | null>(null);
-
 export const MEALS: Meal[] = [
   {
     id: "shakshuka",
@@ -220,10 +143,8 @@ export const MEALS: Meal[] = [
     carbs: 3,
     fat: 0,
     ingredients: [
-      "Water (500ml)",
-      "Lemon, sliced (1/2)",
-      "Fresh Mint Leaves (6-8)",
-      "Ice Cubes (as needed)",
+      "Water (500ml)", "Lemon, sliced (1/2)",
+      "Fresh Mint Leaves (6-8)", "Ice Cubes (as needed)",
     ],
     steps: [
       { step: 1, text: "Combine. Add lemon slices and mint leaves to a pitcher.", time: "1 min" },
@@ -239,4 +160,4 @@ export const MEALS: Meal[] = [
       "Mint soothes the digestive system",
     ],
   },
-    category:
+];
