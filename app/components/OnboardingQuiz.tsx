@@ -47,27 +47,24 @@ export function OnboardingQuiz() {
     }
   };
 
-  const finishQuiz = () => {
-    setProfile({
-      name: quizState.name,
-      gender: quizState.gender,
-      diet: quizState.dietType,
-      healthConditions: quizState.healthConditions,
-      cookingTime: quizState.cookingTime,
-      kitchenSetup: quizState.appliances,
-      lovedFoods: quizState.lovedFoods,
-      currentWeight: quizState.currentWeight,
-      targetWeight: quizState.targetWeight,
-      weightUnit: quizState.weightUnit,
-      healthGoals: quizState.healthGoals,
-      region: quizState.region,
-      age: quizState.age,
-      initials: quizState.name ? quizState.name.substring(0, 2).toUpperCase() : "ME",
-      goal: quizState.healthGoals[0] || "Eat Healthier",
-      targetCalories: 2000,
-    });
-    setCurrentView("dashboard");
-  };
+ const finishQuiz = () => {
+  setProfile({
+    name: quizState.name,
+    gender: quizState.gender,
+    diet: quizState.dietType,
+    healthConditions: quizState.healthConditions,
+    cookingTime: quizState.cookingTime,
+    kitchenSetup: quizState.appliances,
+    lovedFoods: quizState.lovedFoods,
+    healthGoals: quizState.healthGoals,
+    region: quizState.region,
+    age: quizState.age,
+    initials: quizState.name ? quizState.name.substring(0, 2).toUpperCase() : "ME",
+    goal: quizState.healthGoals[0] || "Eat Healthier",
+    targetCalories: 2000,
+  } as any);
+  setCurrentView("dashboard");
+};
 
   const renderStep = () => {
     switch (quizStep) {
