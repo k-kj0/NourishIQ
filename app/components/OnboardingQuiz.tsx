@@ -360,26 +360,8 @@ export function OnboardingQuiz() {
             />
           </div>
         );
-      case 14:
-        return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <Droplets size={40} className="text-green-500 mx-auto mb-3" />
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">Snacks per day</h2>
-            </div>
-            <div className="flex justify-center gap-4">
-              {[0, 1, 2, 3].map((num) => (
-                <button
-                  key={num}
-                  onClick={() => updateQuizState({ snacksPerDay: num })}
-                  className={quizState.snacksPerDay === num ? "w-16 h-16 rounded-2xl border-2 border-green-500 bg-green-50 text-green-700 font-bold text-xl" : "w-16 h-16 rounded-2xl border-2 border-gray-100 text-gray-700 font-bold text-xl"}
-                >
-                  {num}
-                </button>
-              ))}
-            </div>
-          </div>
-        );
+        case 14:
+          return null;
       case 15:
         return (
           <div className="space-y-6">
