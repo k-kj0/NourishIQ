@@ -54,7 +54,7 @@ export function ProfileTab() {
               </label>
               <input
                 value={editForm.name}
-                onChange={(e) =>
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                   setEditForm({ ...editForm, name: e.target.value })
                 }
                 className="w-full p-3 rounded-2xl border-2 border-gray-200 focus:border-green-400 outline-none font-medium text-sm"
@@ -89,7 +89,7 @@ export function ProfileTab() {
           </div>
           <p className="text-sm font-bold text-gray-800">
             {profile.currentWeight
-              ? `${profile.currentWeight} ${profile.weightUnit}`
+              ? profile.currentWeight + " " + profile.weightUnit
               : "Not set"}
           </p>
         </div>
@@ -102,7 +102,7 @@ export function ProfileTab() {
               </span>
             </div>
             <p className="text-sm font-bold text-gray-800">
-              {profile.targetWeight} {profile.weightUnit}
+              {profile.targetWeight + " " + profile.weightUnit}
             </p>
           </div>
         )}
@@ -122,7 +122,7 @@ export function ProfileTab() {
           </span>
         </div>
         <div className="flex gap-2 mb-3">
-          {Array.from({ length: hydrationLog.target }, (_, i) => (
+          {Array.from({ length: hydrationLog.target }, (_, i: number) => (
             <button
               key={i}
               onClick={() => {
