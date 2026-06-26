@@ -94,11 +94,11 @@ export const MEALS: Meal[] = [
       "Feta Cheese (1/4 cup)", "Fresh Parsley or Cilantro (for garnish)",
     ],
     steps: [
-      { step: 1, text: "Sauté Aromatics. Heat olive oil in a skillet over medium heat. Add chopped onions and sauté until soft (about 3-4 mins). Add garlic and cook for another 30 seconds.", time: "4 min" },
-      { step: 2, text: "Add Vegetables. Add chopped red bell pepper and cook for 4-5 minutes until slightly softened.", time: "5 min" },
-      { step: 3, text: "Build the Sauce. Add crushed tomatoes, tomato paste, cumin, paprika, chili flakes, salt, and pepper. Stir well and simmer for 8-10 minutes.", time: "10 min" },
-      { step: 4, text: "Create Wells & Add Eggs. Make 2 small wells in the sauce. Crack an egg into each well. Cover and cook for 5-7 minutes until eggs are set to your liking.", time: "7 min" },
-      { step: 5, text: "Add Feta & Garnish. Sprinkle crumbled feta over the top. Cover for 1-2 minutes until warm. Garnish with fresh parsley or cilantro.", time: "2 min" },
+      { step: 1, text: "Sauté Aromatics. Heat olive oil in a skillet over medium heat. Add chopped onions and sauté until soft (about 3–4 mins). Add garlic and cook for another 30 seconds.", time: "4 min" },
+      { step: 2, text: "Add Vegetables. Add chopped red bell pepper and cook for 4–5 minutes until slightly softened.", time: "5 min" },
+      { step: 3, text: "Build the Sauce. Add crushed tomatoes, tomato paste, cumin, paprika, chili flakes, salt, and pepper. Stir well and let it simmer for 8–10 minutes.", time: "10 min" },
+      { step: 4, text: "Create Wells & Add Eggs. Make 2 small wells in the sauce. Crack an egg into each well. Cover and cook for 5–7 minutes until eggs are set to your liking.", time: "7 min" },
+      { step: 5, text: "Add Feta & Garnish. Sprinkle crumbled feta over the top. Cover for 1–2 minutes until warm. Garnish with fresh parsley or cilantro.", time: "2 min" },
       { step: 6, text: "Serve & Enjoy. Serve hot with whole grain toast, pita, or a side salad.", time: "" },
     ],
     substitutes: [
@@ -107,7 +107,7 @@ export const MEALS: Meal[] = [
       { ingredient: "Canned Tomatoes", alternatives: ["Fresh tomatoes", "Passata"] },
     ],
     benefits: [
-      "High in lycopene from tomatoes - supports heart health",
+      "High in lycopene from tomatoes — supports heart health",
       "Eggs provide complete protein and essential B vitamins",
       "Bell peppers are rich in Vitamin C and antioxidants",
     ],
@@ -131,7 +131,7 @@ export const MEALS: Meal[] = [
     ],
     steps: [
       { step: 1, text: "Marinate Chicken. Mix lemon juice, olive oil, garlic, thyme, rosemary, salt and pepper. Coat chicken and marinate for 15 mins.", time: "15 min" },
-      { step: 2, text: "Cook Chicken. Grill or pan-fry chicken for 6-7 mins per side until cooked through. Rest for 5 minutes then slice.", time: "15 min" },
+      { step: 2, text: "Cook Chicken. Grill or pan-fry chicken for 6–7 mins per side until cooked through. Rest for 5 minutes then slice.", time: "15 min" },
       { step: 3, text: "Assemble Bowl. Add rice as the base, top with greens, tomatoes, and cucumber.", time: "3 min" },
       { step: 4, text: "Top & Serve. Lay sliced chicken on top. Drizzle with extra lemon juice and olive oil.", time: "2 min" },
     ],
@@ -163,8 +163,8 @@ export const MEALS: Meal[] = [
     ],
     steps: [
       { step: 1, text: "Prep. Preheat grill to medium-high. Brush salmon and veggies with olive oil, garlic, salt, and pepper.", time: "5 min" },
-      { step: 2, text: "Grill Veggies. Grill asparagus, zucchini, and peppers for 4-5 mins turning once.", time: "5 min" },
-      { step: 3, text: "Grill Salmon. Place salmon skin-side down. Grill 4-5 mins per side until flaky.", time: "10 min" },
+      { step: 2, text: "Grill Veggies. Grill asparagus, zucchini, and peppers for 4–5 mins turning once.", time: "5 min" },
+      { step: 3, text: "Grill Salmon. Place salmon skin-side down. Grill 4–5 mins per side until flaky.", time: "10 min" },
       { step: 4, text: "Finish. Squeeze lemon over everything, garnish with fresh dill and serve.", time: "2 min" },
     ],
     substitutes: [
