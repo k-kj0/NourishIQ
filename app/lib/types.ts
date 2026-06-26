@@ -1,28 +1,30 @@
 export type TabType = "home" | "explore" | "fridge" | "favorites" | "profile";
 
 export interface QuizState {
+  // ... all your existing fields ...
   name: string;
-  age: number | null;
   gender: string;
   region: string;
   dietType: string[];
   healthGoals: string[];
   healthConditions: string[];
-  hasMenstrualCycle: string;
-  wantMenstrualMeals: boolean;
-  menstrualPhase: string;
-  lovedFoods: string[];
-  avoidedFoods: string[];
-  avoidedTextures: string[];
-  avoidedFlavors: string[];
-  customAvoidances: string[];
   cookingTime: string;
+  appliances: string[];
+  currentWeight: number | null;
+  targetWeight: number | null;
+  weightUnit: string;
+  lovedFoods: string[];
+  avoidedFlavors: string[];
+  mealsPerDay: number;
+  snacksPerDay: number;   // ← ADD THIS LINE
+  age: number | null;
   mealTimes: {
     breakfast: string;
     lunch: string;
     snack: string;
     dinner: string;
   };
+}
   snacksPerDay: number;
   mealsPerDay: number;
   currentWeight: number | null;
