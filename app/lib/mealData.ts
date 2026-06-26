@@ -263,3 +263,73 @@ export const TRAVEL_CUISINES = [
     whyTry: "Named after the chef who invented it in the 1860s — a true taste of Ottoman-era Istanbul.",
   },
 ];
+
+export const WEEKLY_CHALLENGE = {
+  weekLabel: "This week's challenge",
+  sweet: {
+    id: "challenge-lemon-blueberry-cake",
+    name: "Lemon Blueberry Cake",
+    category: "DESSERT",
+    image: "https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=800&q=80",
+    cookTime: "55 min",
+    servings: 8,
+    calories: 310,
+    protein: 5,
+    carbs: 42,
+    fat: 13,
+    ingredients: [
+      "All-Purpose Flour (1.5 cups)", "Baking Powder (1.5 tsp)", "Salt (1/4 tsp)",
+      "Butter, softened (1/2 cup)", "Sugar (1 cup)", "Eggs (2)",
+      "Lemon Zest (1 tbsp)", "Lemon Juice (2 tbsp)", "Greek Yogurt (1/2 cup)",
+      "Fresh Blueberries (1.5 cups)", "Powdered Sugar, for glaze (1/2 cup)",
+    ],
+    steps: [
+      { step: 1, text: "Preheat oven to 350°F (175°C) and grease a loaf pan.", time: "5 min" },
+      { step: 2, text: "Whisk flour, baking powder, and salt together in a bowl.", time: "3 min" },
+      { step: 3, text: "Cream butter and sugar until fluffy, then beat in eggs, lemon zest, and juice.", time: "5 min" },
+      { step: 4, text: "Fold in dry ingredients alternating with yogurt. Gently fold in blueberries.", time: "5 min" },
+      { step: 5, text: "Pour batter into pan and bake for 45–50 minutes until a toothpick comes out clean.", time: "50 min" },
+      { step: 6, text: "Cool, then drizzle with a lemon-powdered-sugar glaze before serving.", time: "10 min" },
+    ],
+    substitutes: [
+      { ingredient: "Butter", alternatives: ["Coconut oil", "Vegan butter"] },
+      { ingredient: "Greek Yogurt", alternatives: ["Sour cream", "Coconut yogurt"] },
+    ],
+    benefits: [
+      "Blueberries are rich in antioxidants",
+      "A lighter alternative to frosted cakes thanks to the yogurt base",
+    ],
+  },
+  savory: {
+    id: "challenge-fish-and-chips",
+    name: "Fish & Chips",
+    category: "DINNER",
+    image: "https://images.unsplash.com/photo-1579208030886-b937da0925dc?w=800&q=80",
+    cookTime: "35 min",
+    servings: 2,
+    calories: 610,
+    protein: 32,
+    carbs: 58,
+    fat: 26,
+    ingredients: [
+      "White Fish Fillets, e.g. cod (2)", "All-Purpose Flour (1 cup)",
+      "Baking Powder (1 tsp)", "Cold Sparkling Water (3/4 cup)",
+      "Salt & Pepper (to taste)", "Potatoes, cut into wedges (3 large)",
+      "Olive Oil (2 tbsp)", "Malt Vinegar (for serving)",
+    ],
+    steps: [
+      { step: 1, text: "Toss potato wedges with olive oil, salt and pepper. Roast at 425°F for 25 minutes.", time: "25 min" },
+      { step: 2, text: "Whisk flour, baking powder, salt, and sparkling water into a light batter.", time: "5 min" },
+      { step: 3, text: "Dip fish fillets in batter and pan-fry or air-fry until golden and crisp.", time: "10 min" },
+      { step: 4, text: "Serve hot with the roasted wedges and malt vinegar.", time: "2 min" },
+    ],
+    substitutes: [
+      { ingredient: "White Fish", alternatives: ["Tofu steaks (vegetarian)", "Halloumi"] },
+      { ingredient: "Potato Wedges", alternatives: ["Sweet potato wedges", "Cauliflower wedges"] },
+    ],
+    benefits: [
+      "White fish is a lean source of high-quality protein",
+      "Air-frying or baking instead of deep-frying cuts down on excess oil",
+    ],
+  },
+};
