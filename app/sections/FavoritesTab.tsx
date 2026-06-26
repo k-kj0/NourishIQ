@@ -52,7 +52,7 @@ export function FavoritesTab() {
                     View Recipe
                   </button>
                   <button
-                    onClick={() => toggleLikeMeal(meal.id)}
+                    onClick={() => toggleLikeMeal(meal)}
                     className="text-red-400 p-1"
                   >
                     <Heart size={16} fill="currentColor" />
