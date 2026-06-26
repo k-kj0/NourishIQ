@@ -14,6 +14,7 @@ export function ExploreTab() {
   const [activeFilter, setActiveFilter] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showFilterPopup, setShowFilterPopup] = useState(false);
+  const [applianceFilter, setApplianceFilter] = useState<string | null>(null);
 
   const filteredMeals = ALL_MEALS.filter((meal) => {
     const matchesFilter = activeFilter === "All" || meal.category.toLowerCase() === activeFilter.toLowerCase();
