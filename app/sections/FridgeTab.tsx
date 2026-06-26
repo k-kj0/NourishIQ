@@ -15,7 +15,6 @@ export function FridgeTab() {
   const [selectedRemedy, setSelectedRemedy] = useState<any>(null);
 
   const handleFindRecipes = () => {
-    // Demo recipe from fridge
     const demoRecipe = {
       id: "fridge-demo",
       name: "Veggie Stir Fry",
@@ -44,7 +43,7 @@ export function FridgeTab() {
       substitutes: [],
       benefits: ["Quick and healthy", "Uses whatever vegetables you have"],
     };
-    setSelectedMeal(demoRecipe);
+    setSelectedMeal(demoRecipe as any);
     setShowRecipeSheet(true);
   };
 
@@ -55,6 +54,12 @@ export function FridgeTab() {
           r.title.toLowerCase().includes(remedySymptom.toLowerCase())
       )
     : HOME_REMEDIES;
+
+  const getSectionClass = (id: string): string => {
+    return activeSection === id
+      ? "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-green-500 text-white"
+      : "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-600 border border-gray-200";
+  };
 
   return (
     <div className="max-w-md mx-auto px-4 pt-6 pb-24">
@@ -68,27 +73,27 @@ export function FridgeTab() {
 
       {/* Section Tabs */}
       <div className="flex gap-2 mb-4">
-        {[
-          { id: "fridge", label: "Fridge", icon: ChefHat },
-          { id: "remedies", label: "Remedies", icon: Leaf },
-          { id: "travel", label: "Travel", icon: Droplets },
-        ].map((sec) => {
-          const Icon = sec.icon;
-          return (
-            <button
-              key={sec.id}
-              onClick={() => setActiveSection(sec.id as any)}
-              className={
-                activeSection === sec.id
-                  ? "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-green-500 text-white"
-                  : "flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold bg-white text-gray-600 border border-gray-200"
-              }
-            >
-              <Icon size={16} />
-              {sec.label}
-            </button>
-          );
-        })}
+        <button
+          onClick={() => setActiveSection("fridge")}
+          className={getSectionClass("fridge")}
+        >
+          <ChefHat size={16} />
+          Fridge
+        </button>
+        <button
+          onClick={() => setActiveSection("remedies")}
+          className={getSectionClass("remedies")}
+        >
+          <Leaf size={16} />
+          Remedies
+        </button>
+        <button
+          onClick={() => setActiveSection("travel")}
+          className={getSectionClass("travel")}
+        >
+          <Droplets size={16} />
+          Travel
+        </button>
       </div>
 
       {/* FRIDGE SECTION */}
@@ -97,7 +102,7 @@ export function FridgeTab() {
           <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
             <textarea
               value={fridgeItems}
-              onChange={(e) => setFridgeItems(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setFridgeItems(e.target.value)}
               placeholder="Type ingredients you have: tomatoes, eggs, spinach, cheese..."
               className="w-full h-24 p-3 rounded-xl bg-gray-50 border border-gray-100 resize-none outline-none text-sm"
             />
@@ -115,7 +120,6 @@ export function FridgeTab() {
             </div>
           </div>
 
-          {/* Preferences */}
           <div className="bg-white rounded-2xl p-4 shadow-sm mb-4">
             <p className="text-sm font-semibold text-gray-700 mb-3">
               Customize preferences
@@ -134,7 +138,6 @@ export function FridgeTab() {
             </div>
           </div>
 
-          {/* AI Suggestions */}
           <div className="bg-white rounded-2xl p-4 shadow-sm">
             <h3 className="text-sm font-bold text-gray-800 mb-3">
               AI Recipe Suggestions
@@ -166,7 +169,7 @@ export function FridgeTab() {
             />
             <input
               value={remedySymptom}
-              onChange={(e) => setRemedySymptom(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setRemedySymptom(e.target.value)}
               placeholder="My head hurts, I feel tired, stomach ache..."
               className="w-full pl-11 pr-4 py-3.5 rounded-2xl bg-white border-2 border-gray-100 focus:border-green-400 outline-none font-medium text-sm shadow-sm"
             />
@@ -178,7 +181,7 @@ export function FridgeTab() {
                 onClick={() => setSelectedRemedy(null)}
                 className="text-sm text-gray-500 mb-3"
               >
-                ← Back to remedies
+                Back to remedies
               </button>
               <h3 className="text-lg font-bold text-gray-900 mb-1">
                 {selectedRemedy.title}
@@ -280,7 +283,7 @@ export function FridgeTab() {
                   {cuisine.description}
                 </p>
                 <div className="flex gap-2 mb-3">
-                  {cuisine.tags.map((tag) => (
+                  {cuisine.tags.map((tag: string) => (
                     <span
                       key={tag}
                       className="px-2 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-medium"
