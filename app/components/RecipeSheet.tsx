@@ -14,6 +14,7 @@ export function RecipeSheet() {
     voiceMode,
     setVoiceMode,
     rateMeal,
+    addIngredientsToGrocery,
   } = useApp();
   const [activeTab, setActiveTab] = useState("ingredients");
   const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(
@@ -64,11 +65,11 @@ export function RecipeSheet() {
             className="w-full h-56 object-cover rounded-t-[2rem]"
             onError={(e) => {
               (e.target as HTMLImageElement).src =
-                "https://placehold.co/800x400/22c55e/ffffff?text=" +
+                "https://placehold.co/800x400/16a34a/ffffff?text=" +
                 encodeURIComponent(selectedMeal.name);
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent rounded-t-[2rem]" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent rounded-t-[2rem]" />
 
           <button
             onClick={() => setShowRecipeSheet(false)}
@@ -77,33 +78,34 @@ export function RecipeSheet() {
             <X size={16} className="text-gray-700" />
           </button>
 
-          <button
-            onClick={() => {
-              setVoiceMode(!voiceMode);
-              if (!voiceMode) speakText(selectedMeal.name + ". " + selectedMeal.ingredients.join(". "));
-            }}
-            className="absolute top-4 left-4 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center shadow-lg"
-          >
-            {voiceMode ? (
-              <Volume2 size={16} className="text-green-600" />
-            ) : (
-              <VolumeX size={16} className="text-gray-600" />
-            )}
-          </button>
+          <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between">
+            <div>
+              <span
+                className="inline-block px-2.5 py-1 rounded-full text-[10px] font-bold uppercase mb-2"
+                style={{ background: "rgba(255,255,255,0.9)", color: "var(--leaf-deep)" }}
+              >
+                {selectedMeal.category}
+              </span>
+              <h2 className="font-display text-xl font-extrabold text-white leading-tight">
+                {selectedMeal.name}
+              </h2>
+            </div>
+            <button
+              onClick={() => {
+                setVoiceMode(!voiceMode);
+                if (!voiceMode) speakText(selectedMeal.name + ". " + selectedMeal.ingredients.join(". "));
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold text-white flex-shrink-0 tap-scale"
+              style={{ background: "var(--leaf)" }}
+            >
+              {voiceMode ? <Volume2 size={14} /> : <VolumeX size={14} />}
+              Listen
+            </button>
+          </div>
         </div>
 
         <div className="px-5 pt-4 pb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="text-green-500 text-xs">&#10022;</span>
-            <span className="text-xs font-bold text-green-600 uppercase tracking-wider">
-              {selectedMeal.category}
-            </span>
-          </div>
-
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            {selectedMeal.name}
-          </h2>
-          <p className="text-sm text-gray-500 mb-4 leading-relaxed">
+          <p className="text-sm mb-4 leading-relaxed" style={{ color: "var(--color-muted-foreground)" }}>
             A hearty and protein-packed dish with fresh ingredients and bold
             flavors.
           </p>
@@ -374,9 +376,13 @@ export function RecipeSheet() {
             </div>
           )}
 
-          <button className="w-full mt-6 bg-green-500 hover:bg-green-600 text-white font-bold py-4 rounded-2xl flex items-center justify-center gap-2 transition-colors">
+          <button
+            onClick={() => addIngredientsToGrocery(selectedMeal.ingredients)}
+            className="w-full mt-6 text-white font-bold py-4 rounded-full flex items-center justify-center gap-2 tap-scale"
+            style={{ background: "var(--leaf)" }}
+          >
             <Plus size={20} />
-            Add to My Meals
+            Add to grocery list
           </button>
         </div>
       </div>
