@@ -108,6 +108,8 @@ type AppContextType = {
   logGoalProgress: (amount: number) => void;
   groceryList: GroceryItem[];
   toggleGroceryItem: (name: string) => void;
+  addIngredientsToGrocery: (items: string[]) => void;
+  groceryToast: string | null;
   selectedDayIndex: number;
   setSelectedDayIndex: (i: number) => void;
 };
@@ -304,11 +306,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [weeklyGoal, setWeeklyGoal] = useState<WeeklyGoal>({
     id: "burn-500", label: "Burn 500 calories", target: 500, unit: "kcal", current: 120,
   });
-  const [groceryList, setGroceryList] = useState<GroceryItem[]>(() => {
-    const names = new Set<string>();
-    MEALS.forEach((m) => m.ingredients.forEach((i) => names.add(i.split("(")[0].trim())));
-    return Array.from(names).map((name) => ({ name, checked: false }));
-  });
+  const [groceryList, setGroceryList] = useState<GroceryItem[]>([]);
+  const [groceryToast, setGroceryToast] = useState<string | null>(null);
   const [selectedDayIndex, setSelectedDayIndex] = useState(0);
   const totalQuizSteps = 14;
 
@@ -322,6 +321,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const toggleGroceryItem = (name: string) => {
     setGroceryList((prev) => prev.map((g) => (g.name === name ? { ...g, checked: !g.checked } : g)));
+  };
+
+  const addIngredientsToGrocery = (items: string[]) => {
+    const cleanNames = items.map((i) => i.split("(")[0].trim());
+    setGroceryList((prev) => {
+      const existing = new Set(prev.map((g) => g.name));
+      const additions = cleanNames.filter((n) => !existing.has(n)).map((name) => ({ name, checked: false }));
+      return [...prev, ...additions];
+    });
+    setGroceryToast(`Added ${cleanNames.length} items to grocery list`);
+    setTimeout(() => setGroceryToast(null), 2500);
   };
 
   const toggleLikeMeal = (meal: Meal) => {
@@ -352,7 +362,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       voiceMode, setVoiceMode, rateMeal,
       hydrationLog, addWater,
       weeklyGoal, setWeeklyGoal, logGoalProgress,
-      groceryList, toggleGroceryItem,
+      groceryList, toggleGroceryItem, addIngredientsToGrocery, groceryToast,
       selectedDayIndex, setSelectedDayIndex,
     }}>
       {children}
