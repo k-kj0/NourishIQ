@@ -2,7 +2,7 @@
 import { useApp } from "../AppContext";
 import { ShoppingBasket, Check } from "lucide-react";
 
-export default function GroceryTab() {
+export function GroceryTab() {
   const { groceryList, toggleGroceryItem } = useApp();
   const checkedCount = groceryList.filter((g) => g.checked).length;
 
