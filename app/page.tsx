@@ -33,7 +33,7 @@ const DATA_MEALS: Meal[] = [
     fat: 14,
     cookTime: "25 min",
     servings: 1,
-    image: "https://unsplash.com",
+    image: "https://source.unsplash.com/400x300/?shakshuka",
     description: "Rich spiced tomato and pepper sauce with perfectly poached eggs and crumbly feta.",
     ingredients: [{ name: "Eggs", amount: "2 large" }, { name: "Crumbled Feta", amount: "50 g" }],
     steps: ["Cook peppers and spices.", "Add tomato puree and simmer.", "Poach eggs inside."]
@@ -48,7 +48,7 @@ const DATA_MEALS: Meal[] = [
     fat: 16,
     cookTime: "30 min",
     servings: 2,
-    image: "https://unsplash.com",
+    image: "https://source.unsplash.com/400x300/?chicken-bowl",
     description: "Citrusy grilled chicken over fluffy quinoa, avocado and crisp greens.",
     ingredients: [{ name: "Chicken breast", amount: "200 g" }, { name: "Cooked quinoa", amount: "1 cup" }],
     steps: ["Marinate chicken.", "Grill chicken.", "Assemble bowls with greens."]
@@ -63,7 +63,7 @@ const DATA_MEALS: Meal[] = [
     fat: 12,
     cookTime: "30 min",
     servings: 2,
-    image: "https://unsplash.com",
+    image: "https://source.unsplash.com/400x300/?chickpea-curry",
     description: "Traditional chickpea curry cooked with spices, served with flatbread.",
     ingredients: [{ name: "Chickpeas", amount: "1.5 cups" }, { name: "Flatbread", amount: "2 pieces" }],
     steps: ["Sauté onions.", "Simmer chickpeas.", "Serve with warm flatbreads."]
@@ -78,7 +78,7 @@ const DATA_MEALS: Meal[] = [
     fat: 6,
     cookTime: "15 min",
     servings: 1,
-    image: "https://unsplash.com",
+    image: "https://source.unsplash.com/400x300/?poha,rice",
     description: "Fluffy flattened rice seasoned with yellow turmeric, mustard seeds, and peanuts.",
     ingredients: [{ name: "Flattened Rice", amount: "1 cup" }, { name: "Turmeric", amount: "0.5 tsp" }],
     steps: ["Rinse flattened rice.", "Sauté tempering spices.", "Gently mix ingredients."]
@@ -89,15 +89,15 @@ const TRAVEL_CUISINES = [
   {
     country: "Japan", tag: "JP VEGAN", bg: "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)",
     items: [
-      { name: "Miso Soup", time: "15 min", kcal: "110 kcal", img: "https://unsplash.com" },
-      { name: "Avocado Sushi", time: "25 min", kcal: "290 kcal", img: "https://unsplash.com" }
+      { name: "Miso Soup", time: "15 min", kcal: "110 kcal", img: "https://source.unsplash.com/400x300/?miso-soup" },
+      { name: "Avocado Sushi", time: "25 min", kcal: "290 kcal", img: "https://source.unsplash.com/400x300/?avocado-sushi" }
     ]
   },
   {
     country: "India", tag: "IN VEGAN", bg: "linear-gradient(135deg, #db2777 0%, #f43f5e 100%)",
     items: [
-      { name: "Chola Masala with Flatbread", time: "30 min", kcal: "410 kcal", img: "https://unsplash.com" },
-      { name: "Poha", time: "15 min", kcal: "280 kcal", img: "https://unsplash.com" }
+      { name: "Chola Masala with Flatbread", time: "30 min", kcal: "410 kcal", img: "https://source.unsplash.com/400x300/?chickpea-curry" },
+      { name: "Poha", time: "15 min", kcal: "280 kcal", img: "https://source.unsplash.com/400x300/?poha,rice" }
     ]
   }
 ];
@@ -110,12 +110,12 @@ const APOTHECARY_ITEMS = [
 ];
 
 const CRAVER_DECK = [
-  { name: "Spaghetti", img: "https://unsplash.com" },
-  { name: "Sushi", img: "https://unsplash.com" },
-  { name: "Tacos", img: "https://unsplash.com" },
-  { name: "Ramen", img: "https://unsplash.com" },
-  { name: "Pizza", img: "https://unsplash.com" },
-  { name: "Buddha Bowl", img: "https://unsplash.com" }
+  { name: "Spaghetti", img: "https://source.unsplash.com/400x300/?spaghetti" },
+  { name: "Sushi", img: "https://source.unsplash.com/400x300/?sushi" },
+  { name: "Tacos", img: "https://source.unsplash.com/400x300/?tacos" },
+  { name: "Ramen", img: "https://source.unsplash.com/400x300/?ramen" },
+  { name: "Pizza", img: "https://source.unsplash.com/400x300/?pizza" },
+  { name: "Buddha Bowl", img: "https://source.unsplash.com/400x300/?buddha-bowl" }
 ];
 
 const DAYS = [
