@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Bell, ChevronDown, ChevronLeft, ChevronRight, Volume2, Home, 
   Sparkles, Plane, ShoppingBasket, User, X, Plus, Minus, Camera, Award, ShieldAlert
@@ -9,93 +9,34 @@ import {
 interface Meal {
   id: string;
   name: string;
-  category: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK" | "BEVERAGE";
+  category: "BREAKFAST" | "LUNCH" | "DINNER" | "SNACK";
   calories: number;
   protein: number;
-  carbs: number;
-  fat: number;
   cookTime: string;
-  servings: number;
   description: string;
   ingredients: { name: string; amount: string }[];
-  steps: string[];
 }
 
-const DATA_MEALS: Meal[] = [
-  {
-    id: "m1",
-    name: "Shakshuka",
-    category: "BREAKFAST",
-    calories: 352,
-    protein: 22,
-    carbs: 36,
-    fat: 14,
-    cookTime: "25 min",
-    servings: 1,
-    description: "Rich spiced tomato and pepper sauce with perfectly poached eggs and crumbly feta.",
-    ingredients: [{ name: "Eggs", amount: "2 large" }, { name: "Crumbled Feta", amount: "50 g" }],
-    steps: ["Cook peppers and spices.", "Add tomato puree and simmer.", "Poach eggs inside."]
-  },
-  {
-    id: "m2",
-    name: "Chicken Curry",
-    category: "LUNCH",
-    calories: 480,
-    protein: 34,
-    carbs: 42,
-    fat: 16,
-    cookTime: "30 min",
-    servings: 2,
-    description: "Citrusy grilled chicken over fluffy quinoa, avocado and crisp greens.",
-    ingredients: [{ name: "Chicken breast", amount: "200 g" }, { name: "Cooked quinoa", amount: "1 cup" }],
-    steps: ["Marinate chicken.", "Grill chicken.", "Assemble bowls with greens."]
-  },
-  {
-    id: "m3",
-    name: "Chana Masala",
-    category: "DINNER",
-    calories: 410,
-    protein: 16,
-    carbs: 58,
-    fat: 12,
-    cookTime: "30 min",
-    servings: 2,
-    description: "Traditional chickpea curry cooked with spices, served with flatbread.",
-    ingredients: [{ name: "Chickpeas", amount: "1.5 cups" }, { name: "Flatbread", amount: "2 pieces" }],
-    steps: ["Sauté onions.", "Simmer chickpeas.", "Serve with warm flatbreads."]
-  },
-  {
-    id: "m4",
-    name: "Rice Pudding",
-    category: "SNACK",
-    calories: 280,
-    protein: 8,
-    carbs: 46,
-    fat: 6,
-    cookTime: "15 min",
-    servings: 1,
-    description: "Fluffy flattened rice seasoned with yellow turmeric, mustard seeds, and peanuts.",
-    ingredients: [{ name: "Flattened Rice", amount: "1 cup" }, { name: "Turmeric", amount: "0.5 tsp" }],
-    steps: ["Rinse flattened rice.", "Sauté tempering spices.", "Gently mix ingredients."]
-  }
+// Larger candidate pool than we need — we only keep the ones TheMealDB
+// actually has a real photo for. Nothing fake ever gets rendered.
+const MEAL_CANDIDATES: Meal[] = [
+  { id: "c1", name: "Shakshuka", category: "BREAKFAST", calories: 352, protein: 22, cookTime: "25 min", description: "Spiced tomato and pepper sauce with poached eggs and feta.", ingredients: [{ name: "Eggs", amount: "2 large" }, { name: "Feta", amount: "50 g" }] },
+  { id: "c2", name: "Pancakes", category: "BREAKFAST", calories: 310, protein: 9, cookTime: "20 min", description: "Classic fluffy pancakes.", ingredients: [{ name: "Flour", amount: "1 cup" }, { name: "Milk", amount: "1 cup" }] },
+  { id: "c3", name: "Chicken Curry", category: "LUNCH", calories: 480, protein: 34, cookTime: "35 min", description: "Slow-cooked chicken in a spiced curry sauce.", ingredients: [{ name: "Chicken", amount: "300 g" }, { name: "Curry paste", amount: "2 tbsp" }] },
+  { id: "c4", name: "Spaghetti Bolognese", category: "LUNCH", calories: 520, protein: 28, cookTime: "40 min", description: "Rich meat sauce over pasta.", ingredients: [{ name: "Spaghetti", amount: "200 g" }, { name: "Ground beef", amount: "250 g" }] },
+  { id: "c5", name: "Beef Stroganoff", category: "DINNER", calories: 540, protein: 30, cookTime: "35 min", description: "Beef in a creamy mushroom sauce.", ingredients: [{ name: "Beef strips", amount: "300 g" }, { name: "Mushrooms", amount: "200 g" }] },
+  { id: "c6", name: "Teriyaki Chicken Casserole", category: "DINNER", calories: 460, protein: 32, cookTime: "40 min", description: "Chicken baked in a sweet-savory teriyaki glaze.", ingredients: [{ name: "Chicken thighs", amount: "300 g" }, { name: "Teriyaki sauce", amount: "3 tbsp" }] },
+  { id: "c7", name: "Apple Frangipan Tart", category: "SNACK", calories: 290, protein: 6, cookTime: "45 min", description: "Almond frangipane tart topped with apple.", ingredients: [{ name: "Apples", amount: "2" }, { name: "Ground almonds", amount: "100 g" }] },
+  { id: "c8", name: "Beef and Mustard Pie", category: "SNACK", calories: 410, protein: 20, cookTime: "50 min", description: "Rich beef filling in a flaky pastry crust.", ingredients: [{ name: "Beef chunks", amount: "300 g" }, { name: "Puff pastry", amount: "1 sheet" }] },
 ];
 
-const TRAVEL_CUISINES = [
-  {
-    country: "Japan", tag: "JP VEGAN", bg: "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)",
-    items: [
-      { name: "Miso Soup", time: "15 min", kcal: "110 kcal" },
-      { name: "Sushi", time: "25 min", kcal: "290 kcal" }
-    ]
-  },
-  {
-    country: "India", tag: "IN VEGAN", bg: "linear-gradient(135deg, #db2777 0%, #f43f5e 100%)",
-    items: [
-      { name: "Chana Masala", time: "30 min", kcal: "410 kcal" },
-      { name: "Rice Pudding", time: "15 min", kcal: "280 kcal" }
-    ]
-  }
+const TRAVEL_CANDIDATES = [
+  { country: "Japan", tag: "JP", bg: "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)", dishes: ["Sushi", "Teriyaki Chicken Casserole", "Ramen"] },
+  { country: "India", tag: "IN", bg: "linear-gradient(135deg, #db2777 0%, #f43f5e 100%)", dishes: ["Chicken Curry", "Vegetable Curry", "Naan"] },
+  { country: "Italy", tag: "IT", bg: "linear-gradient(135deg, #059669 0%, #10b981 100%)", dishes: ["Spaghetti Bolognese", "Pizza", "Lasagne"] },
 ];
+
+const CRAVER_CANDIDATES = ["Spaghetti Bolognese", "Sushi", "Tacos", "Ramen", "Pizza", "Pancakes", "Beef Stroganoff", "Apple Frangipan Tart"];
 
 const APOTHECARY_ITEMS = [
   { id: "ap1", name: "Ginger Turmeric Health Shot", category: "TONIC", desc: "Immunity & inflammation", color: "#FFB020" },
@@ -104,21 +45,7 @@ const APOTHECARY_ITEMS = [
   { id: "ap4", name: "Honey Oat Calming Mask", category: "MASK", desc: "Soothing & hydration", color: "#EC4899" }
 ];
 
-const CRAVER_DECK = [
-  { name: "Spaghetti" },
-  { name: "Sushi" },
-  { name: "Tacos" },
-  { name: "Ramen" },
-  { name: "Pizza" },
-  { name: "Salad" }
-];
-
-const DAYS = [
-  { day: "MON", date: 22 }, { day: "TUE", date: 23 }, { day: "WED", date: 24 },
-  { day: "THU", date: 25 }, { day: "FRI", date: 26 }, { day: "SAT", date: 27 }, { day: "SUN", date: 28 }
-];
-
-// --- TheMealDB integration: free, no signup, test API key "1" ---
+// --- TheMealDB (free, no signup, test key "1") ---
 
 interface MealDbResult {
   strMeal: string;
@@ -132,13 +59,10 @@ async function fetchDishImage(query: string): Promise<string | null> {
   try {
     const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
     const data = await res.json();
-    if (data.meals && data.meals[0]?.strMealThumb) {
-      return data.meals[0].strMealThumb as string;
-    }
-  } catch (e) {
-    // network error or lookup failed — caller falls back to placeholder
+    return data.meals?.[0]?.strMealThumb ?? null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
 async function fetchRealRecipe(query: string): Promise<MealDbResult | null> {
@@ -146,74 +70,121 @@ async function fetchRealRecipe(query: string): Promise<MealDbResult | null> {
     const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
     const data = await res.json();
     return data.meals ? (data.meals[0] as MealDbResult) : null;
-  } catch (e) {
+  } catch {
     return null;
   }
 }
 
-// Reusable image component: shows a real dish photo if found, otherwise a clean emoji placeholder.
-// Never renders a broken image icon.
-function DishImage({
-  name,
-  images,
-  className,
-  emoji = "🍽️",
-}: {
-  name: string;
-  images: Record<string, string | null>;
-  className: string;
-  emoji?: string;
-}) {
-  const url = images[name];
-  if (url) {
-    return <img src={url} alt={name} className={className} />;
+function DishImage({ url, className, emoji = "🍽️" }: { url: string | null | undefined; className: string; emoji?: string }) {
+  if (url) return <img src={url} alt="" className={className} />;
+  return <div className={`${className} bg-orange-100 flex items-center justify-center text-lg`}>{emoji}</div>;
+}
+
+// --- Free, keyless, in-browser food recognition via TensorFlow.js + MobileNet ---
+// Loaded from CDN, runs entirely client-side. No API key, no signup, no backend.
+
+function loadScriptOnce(src: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[data-src="${src}"]`)) return resolve();
+    const script = document.createElement("script");
+    script.src = src;
+    script.dataset.src = src;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load " + src));
+    document.body.appendChild(script);
+  });
+}
+
+const FOOD_KEYWORD_ESTIMATES: Record<string, { kcal: number; protein: number; swap: string }> = {
+  pizza: { kcal: 285, protein: 12, swap: "Choose thin crust and load up on vegetable toppings." },
+  cheeseburger: { kcal: 540, protein: 25, swap: "Swap the bun for lettuce wrap to cut ~150 kcal." },
+  hotdog: { kcal: 290, protein: 10, swap: "Try a chicken or turkey sausage version." },
+  "ice cream": { kcal: 210, protein: 4, swap: "Frozen yogurt cuts calories while keeping the creaminess." },
+  guacamole: { kcal: 150, protein: 2, swap: "Great as-is — pair with veggie sticks instead of chips." },
+  pretzel: { kcal: 340, protein: 8, swap: "Go for a whole-grain pretzel for more fiber." },
+  bagel: { kcal: 245, protein: 10, swap: "Use avocado instead of cream cheese for healthier fats." },
+  meatloaf: { kcal: 320, protein: 24, swap: "Use lean turkey mince to lower saturated fat." },
+  burrito: { kcal: 450, protein: 20, swap: "Ask for brown rice and extra veggies, less cheese." },
+  espresso: { kcal: 5, protein: 0, swap: "Already a light choice — skip the added sugar." },
+  trifle: { kcal: 380, protein: 5, swap: "Use Greek yogurt layers instead of custard." },
+  waffle: { kcal: 290, protein: 7, swap: "Top with fruit instead of syrup." },
+  banana: { kcal: 105, protein: 1, swap: "A great low-effort snack as-is." },
+  orange: { kcal: 62, protein: 1, swap: "Whole fruit beats juice for fiber." },
+  strawberry: { kcal: 32, protein: 1, swap: "Pair with Greek yogurt for a protein boost." },
+  pineapple: { kcal: 82, protein: 1, swap: "Naturally sweet — good as a dessert swap." },
+  salad: { kcal: 180, protein: 6, swap: "Go easy on creamy dressings." },
+  sushi: { kcal: 350, protein: 18, swap: "Choose sashimi over tempura rolls to cut fat." },
+  pasta: { kcal: 480, protein: 16, swap: "Whole wheat pasta adds fiber for the same calories." },
+};
+
+function estimateFromLabel(label: string) {
+  const lower = label.toLowerCase();
+  for (const key of Object.keys(FOOD_KEYWORD_ESTIMATES)) {
+    if (lower.includes(key)) return { label, ...FOOD_KEYWORD_ESTIMATES[key] };
   }
-  return (
-    <div className={`${className} bg-orange-100 flex items-center justify-center text-lg`}>
-      {emoji}
-    </div>
-  );
+  return { label, kcal: 300, protein: 10, swap: "General estimate — recognized food type not in our lookup table yet." };
 }
 
 export default function NourishIQApp() {
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activeTab, setActiveTab] = useState("Home");
-  const [selectedDayIndex, setSelectedDayIndex] = useState(5);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [showRecipeSheet, setShowRecipeSheet] = useState(false);
   const [showApothecary, setShowApothecary] = useState(false);
   const [waterCount, setWaterCount] = useState(0);
   const [groceryToast, setGroceryToast] = useState<string | null>(null);
-  const [scanState, setScanState] = useState<"idle" | "image_selected" | "scanning" | "done">("idle");
+
+  const [scanState, setScanState] = useState<"idle" | "image_selected" | "scanning" | "done" | "error">("idle");
   const [scannedFileName, setScannedFileName] = useState("");
+  const [scanResult, setScanResult] = useState<{ label: string; kcal: number; protein: number; swap: string } | null>(null);
+  const imgPreviewRef = useRef<HTMLImageElement>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const modelRef = useRef<any>(null);
+
   const [craverInput, setCraverInput] = useState("");
   const [craverResult, setCraverResult] = useState<MealDbResult | null>(null);
   const [craverLoading, setCraverLoading] = useState(false);
   const [craverNotFound, setCraverNotFound] = useState(false);
 
-  const [dishImages, setDishImages] = useState<Record<string, string | null>>({});
-
   const [groceryList, setGroceryList] = useState<{ name: string; checked: boolean }[]>([
     { name: "Chicken breast", checked: false }, { name: "Lemon juice", checked: false }
   ]);
 
-  const [profile, setProfile] = useState({
-    name: "", step: 1, goal: "Eat cleaner", diet: "Omnivore"
-  });
+  const [profile, setProfile] = useState({ name: "", step: 1, goal: "Eat cleaner", diet: "Omnivore" });
 
-  // Fetch real dish photos on mount for every dish name used across the app.
+  const [meals, setMeals] = useState<Meal[]>([]);
+  const [travelData, setTravelData] = useState<{ country: string; tag: string; bg: string; items: { name: string; img: string }[] }[]>([]);
+  const [craverDeck, setCraverDeck] = useState<{ name: string; img: string }[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  // Resolve all dish data against real photos on load. Anything without
+  // a real photo is dropped entirely — never shown as a placeholder tile.
   useEffect(() => {
-    const allDishNames = [
-      ...DATA_MEALS.map(m => m.name),
-      ...TRAVEL_CUISINES.flatMap(c => c.items.map(i => i.name)),
-      ...CRAVER_DECK.map(d => d.name),
-    ];
-    const uniqueNames = Array.from(new Set(allDishNames));
+    (async () => {
+      const mealResults = await Promise.all(
+        MEAL_CANDIDATES.map(async (m) => ({ meal: m, img: await fetchDishImage(m.name) }))
+      );
+      const realMeals = mealResults.filter(r => r.img).slice(0, 4);
+      setMeals(realMeals.map(r => ({ ...r.meal, imgUrl: r.img } as any)));
 
-    uniqueNames.forEach(async (name) => {
-      const url = await fetchDishImage(name);
-      setDishImages(prev => ({ ...prev, [name]: url }));
-    });
+      const travelResults = await Promise.all(
+        TRAVEL_CANDIDATES.map(async (country) => {
+          const dishResults = await Promise.all(
+            country.dishes.map(async (name) => ({ name, img: await fetchDishImage(name) }))
+          );
+          const realDishes = dishResults.filter(d => d.img).slice(0, 2) as { name: string; img: string }[];
+          return { country: country.country, tag: country.tag, bg: country.bg, items: realDishes };
+        })
+      );
+      setTravelData(travelResults.filter(c => c.items.length > 0));
+
+      const craverResults = await Promise.all(
+        CRAVER_CANDIDATES.map(async (name) => ({ name, img: await fetchDishImage(name) }))
+      );
+      setCraverDeck(craverResults.filter(c => c.img).slice(0, 6) as { name: string; img: string }[]);
+
+      setDataLoading(false);
+    })();
   }, []);
 
   const speakText = (text: string) => {
@@ -225,15 +196,33 @@ export default function NourishIQApp() {
     }
   };
 
-  const executeScanningSequence = () => {
-    setScanState("scanning");
-    setTimeout(() => setScanState("done"), 2200);
-  };
-
   const handleImageChoice = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setScannedFileName(e.target.files[0].name);
+      const file = e.target.files[0];
+      setScannedFileName(file.name);
+      const url = URL.createObjectURL(file);
+      setPreviewUrl(url);
       setScanState("image_selected");
+    }
+  };
+
+  const runRealScan = async () => {
+    setScanState("scanning");
+    try {
+      if (!modelRef.current) {
+        await loadScriptOnce("https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js");
+        await loadScriptOnce("https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js");
+        modelRef.current = await (window as any).mobilenet.load();
+      }
+      // wait a tick for the preview <img> to actually render before classifying it
+      await new Promise(r => setTimeout(r, 300));
+      if (!imgPreviewRef.current) throw new Error("no image element");
+      const predictions = await modelRef.current.classify(imgPreviewRef.current);
+      const topLabel = predictions?.[0]?.className?.split(",")[0] || "unrecognized food";
+      setScanResult(estimateFromLabel(topLabel));
+      setScanState("done");
+    } catch (err) {
+      setScanState("error");
     }
   };
 
@@ -244,124 +233,154 @@ export default function NourishIQApp() {
     setCraverResult(null);
     const result = await fetchRealRecipe(craverInput);
     setCraverLoading(false);
-    if (result) {
-      setCraverResult(result);
-    } else {
-      setCraverNotFound(true);
-    }
+    if (result) setCraverResult(result); else setCraverNotFound(true);
   };
 
+  // --- Onboarding: redesigned to match reference mockups ---
   if (!isOnboarded) {
     const handleNext = () => {
       if (profile.step === 10) setIsOnboarded(true);
       else setProfile(p => ({ ...p, step: p.step + 1 }));
     };
 
+    const STEP_ICONS = [
+      { emoji: "🥗", label: "Meal Plans", color: "#DCFCE7" },
+      { emoji: "📷", label: "Plate Scans", color: "#FEE2E2" },
+      { emoji: "🌍", label: "Travel Cuisine", color: "#FEF3C7" },
+      { emoji: "🍩", label: "Cravings", color: "#EDE9FE" },
+      { emoji: "🌿", label: "Apothecary", color: "#D1FAE5" },
+    ];
+
     return (
-      <div className="min-h-screen max-w-md mx-auto flex flex-col justify-between px-6 py-8 bg-[#FCFBF7] shadow-2xl">
-        <div className="w-full">
-          <p className="text-[11px] font-black text-center text-emerald-950 tracking-widest">{profile.step} / 10</p>
-          <div className="w-full h-1 bg-neutral-100 rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-green-600 transition-all duration-300" style={{ width: `${profile.step * 10}%` }} />
+      <div className="min-h-screen max-w-md mx-auto flex flex-col justify-between px-6 py-8 bg-[#FCFBF7] relative overflow-hidden shadow-2xl">
+        <div className="absolute top-6 left-4 text-2xl opacity-40 select-none">🍃</div>
+        <div className="absolute top-24 right-6 text-xl opacity-30 select-none">💚</div>
+        <div className="absolute bottom-32 left-6 text-xl opacity-30 select-none">✨</div>
+        <div className="absolute bottom-10 right-10 text-2xl opacity-30 select-none">🍃</div>
+
+        <div className="w-full relative z-10">
+          <div className="flex justify-between items-center mb-1">
+            <p className="text-[10px] font-black text-emerald-800 tracking-widest">{profile.step} / 10</p>
+          </div>
+          <div className="w-full h-1.5 bg-emerald-100 rounded-full overflow-hidden">
+            <div className="h-full bg-green-600 transition-all duration-300 rounded-full" style={{ width: `${profile.step * 10}%` }} />
           </div>
         </div>
 
-        <div className="flex-1 flex flex-col justify-center my-8 text-center">
-          <h2 className="font-display text-3xl font-black text-emerald-600 mb-6">NourishIQ</h2>
+        <div className="flex-1 flex flex-col justify-center my-6 text-center relative z-10">
+          <h2 className="font-display text-3xl font-black text-emerald-600 mb-1">NourishIQ</h2>
 
           {profile.step === 1 && (
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold text-gray-800">Welcome to NourishIQ 🌿</h3>
-              <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed bg-white border p-4 rounded-2xl shadow-sm">
-                Personalised meal plans, plate scans, travel cuisine, cravings, and DIY apothecary.
+            <div className="space-y-5">
+              <div className="text-6xl">🥗</div>
+              <h3 className="text-xl font-black text-gray-800">Your personal food companion</h3>
+              <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed">
+                Get personalised meal plans, plate scans, travel cuisine, cravings and DIY apothecary — all in one place.
               </p>
+              <div className="flex flex-wrap justify-center gap-3 pt-2">
+                {STEP_ICONS.map((s) => (
+                  <div key={s.label} className="flex flex-col items-center gap-1 w-16">
+                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-lg" style={{ background: s.color }}>{s.emoji}</div>
+                    <span className="text-[8px] font-bold text-gray-500 text-center leading-tight">{s.label}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
           {profile.step === 2 && (
-            <div className="space-y-4">
-              <h3 className="text-base font-bold text-gray-800">What should we call you? 👋</h3>
-              <input type="text" value={profile.name} onChange={e => setProfile(p => ({ ...p, name: e.target.value }))} placeholder="Your name" className="w-full max-w-xs mx-auto border bg-white rounded-full px-5 py-3 text-xs text-center font-bold" />
+            <div className="space-y-5">
+              <div className="text-6xl">👋</div>
+              <h3 className="text-xl font-black text-gray-800">What should we call you?</h3>
+              <input type="text" value={profile.name} onChange={e => setProfile(p => ({ ...p, name: e.target.value }))} placeholder="Your name" className="w-full max-w-xs mx-auto border-none bg-white rounded-full px-5 py-3.5 text-sm text-center font-bold shadow-sm" />
             </div>
           )}
 
           {profile.step === 3 && (
-            <div className="space-y-2 max-w-xs mx-auto w-full">
-              <h3 className="text-base font-bold text-gray-800 mb-2">How do you identify? 🧬</h3>
+            <div className="space-y-3 max-w-xs mx-auto w-full">
+              <div className="text-5xl mb-1">🥗</div>
+              <h3 className="text-lg font-black text-gray-800 mb-2">How do you identify?</h3>
               {["Male", "Female", "Non-binary", "Prefer not to say"].map((g) => (
-                <button key={g} type="button" onClick={handleNext} className="w-full bg-white border p-3 rounded-xl font-bold text-xs text-gray-700 hover:border-green-600 mb-1">{g}</button>
+                <button key={g} type="button" onClick={handleNext} className="w-full bg-white p-3.5 rounded-2xl font-bold text-xs text-gray-700 shadow-sm hover:shadow-md transition-shadow mb-1.5 text-left px-5">{g}</button>
               ))}
             </div>
           )}
 
           {profile.step === 4 && (
-            <div className="space-y-2 max-w-xs mx-auto w-full">
-              <h3 className="text-base font-bold text-gray-800 mb-2">What&apos;s your health goal? 🎯</h3>
+            <div className="space-y-3 max-w-xs mx-auto w-full">
+              <div className="text-5xl mb-1">🎯</div>
+              <h3 className="text-lg font-black text-gray-800 mb-2">What&apos;s your health goal?</h3>
               {["Lose fat", "Build muscle", "Eat cleaner", "Boost energy"].map((g) => (
-                <button key={g} type="button" onClick={() => { setProfile(p => ({ ...p, goal: g })); handleNext(); }} className={`w-full p-3 rounded-xl font-bold text-xs border ${profile.goal === g ? "bg-green-50 border-green-600 text-green-700" : "bg-white text-gray-700"}`}>{g}</button>
+                <button key={g} type="button" onClick={() => { setProfile(p => ({ ...p, goal: g })); handleNext(); }} className={`w-full p-3.5 rounded-2xl font-bold text-xs text-left px-5 shadow-sm ${profile.goal === g ? "bg-green-100 text-green-700" : "bg-white text-gray-700"}`}>{g}</button>
               ))}
             </div>
           )}
 
           {profile.step === 5 && (
-            <div className="space-y-2 max-w-xs mx-auto w-full">
-              <h3 className="text-base font-bold text-gray-800 mb-2">What dietary path do you follow? 🥦</h3>
+            <div className="space-y-3 max-w-xs mx-auto w-full">
+              <div className="text-5xl mb-1">🥦</div>
+              <h3 className="text-lg font-black text-gray-800 mb-2">Dietary path?</h3>
               {["Omnivore", "Vegetarian", "Vegan", "Pescatarian"].map((d) => (
-                <button key={d} type="button" onClick={handleNext} className="w-full bg-white border p-3 rounded-xl font-bold text-xs text-gray-700 mb-1">{d}</button>
+                <button key={d} type="button" onClick={handleNext} className="w-full bg-white p-3.5 rounded-2xl font-bold text-xs text-gray-700 shadow-sm mb-1.5 text-left px-5">{d}</button>
               ))}
             </div>
           )}
 
           {profile.step === 6 && (
-            <div className="space-y-2 max-w-xs mx-auto w-full">
-              <h3 className="text-base font-bold text-gray-800 mb-2">Any specific food allergies? ⚠️</h3>
+            <div className="space-y-3 max-w-xs mx-auto w-full">
+              <div className="text-5xl mb-1">⚠️</div>
+              <h3 className="text-lg font-black text-gray-800 mb-2">Food allergies?</h3>
               {["Gluten Free", "Nut Free", "Dairy Free", "None"].map((a) => (
-                <button key={a} type="button" onClick={handleNext} className="w-full bg-white border p-3 rounded-xl font-bold text-xs text-gray-700 mb-1">{a}</button>
+                <button key={a} type="button" onClick={handleNext} className="w-full bg-white p-3.5 rounded-2xl font-bold text-xs text-gray-700 shadow-sm mb-1.5 text-left px-5">{a}</button>
               ))}
             </div>
           )}
 
           {profile.step === 7 && (
-            <div className="space-y-2 max-w-xs mx-auto w-full">
-              <h3 className="text-base font-bold text-gray-800 mb-2">Preferred spice tolerance? 🌶️</h3>
+            <div className="space-y-3 max-w-xs mx-auto w-full">
+              <div className="text-5xl mb-1">🌶️</div>
+              <h3 className="text-lg font-black text-gray-800 mb-2">Spice tolerance?</h3>
               {["Mild", "Medium", "Extra Hot"].map((s) => (
-                <button key={s} type="button" onClick={handleNext} className="w-full bg-white border p-3 rounded-xl font-bold text-xs text-gray-700 mb-1">{s}</button>
+                <button key={s} type="button" onClick={handleNext} className="w-full bg-white p-3.5 rounded-2xl font-bold text-xs text-gray-700 shadow-sm mb-1.5 text-left px-5">{s}</button>
               ))}
             </div>
           )}
 
           {profile.step === 8 && (
-            <div className="space-y-2 max-w-xs mx-auto w-full">
-              <h3 className="text-base font-bold text-gray-800 mb-2">Usual duration for cooking? ⏱️</h3>
+            <div className="space-y-3 max-w-xs mx-auto w-full">
+              <div className="text-5xl mb-1">⏱️</div>
+              <h3 className="text-lg font-black text-gray-800 mb-2">Cooking duration?</h3>
               {["Less than 15m", "30 minutes", "Under an hour"].map((t) => (
-                <button key={t} type="button" onClick={handleNext} className="w-full bg-white border p-3 rounded-xl font-bold text-xs text-gray-700 mb-1">{t}</button>
+                <button key={t} type="button" onClick={handleNext} className="w-full bg-white p-3.5 rounded-2xl font-bold text-xs text-gray-700 shadow-sm mb-1.5 text-left px-5">{t}</button>
               ))}
             </div>
           )}
 
           {profile.step === 9 && (
-            <div className="space-y-2 max-w-xs mx-auto w-full">
-              <h3 className="text-base font-bold text-gray-800 mb-2">Daily hydration target? 💧</h3>
+            <div className="space-y-3 max-w-xs mx-auto w-full">
+              <div className="text-5xl mb-1">💧</div>
+              <h3 className="text-lg font-black text-gray-800 mb-2">Hydration target?</h3>
               {["1-2 Litres", "3 Litres+", "Not tracking"].map((w) => (
-                <button key={w} type="button" onClick={handleNext} className="w-full bg-white border p-3 rounded-xl font-bold text-xs text-gray-700 mb-1">{w}</button>
+                <button key={w} type="button" onClick={handleNext} className="w-full bg-white p-3.5 rounded-2xl font-bold text-xs text-gray-700 shadow-sm mb-1.5 text-left px-5">{w}</button>
               ))}
             </div>
           )}
 
           {profile.step === 10 && (
-            <div className="space-y-3">
-              <h3 className="text-base font-bold text-gray-800">Primary cooking hardware? 🍳</h3>
+            <div className="space-y-4">
+              <div className="text-5xl mb-1">🍳</div>
+              <h3 className="text-lg font-black text-gray-800">Cooking hardware?</h3>
               <div className="flex flex-wrap gap-2 justify-center max-w-xs mx-auto">
                 {["Stovetop", "Oven", "Air fryer", "Blender"].map(ap => (
-                  <span key={ap} onClick={handleNext} className="bg-white border border-green-200 text-green-800 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm cursor-pointer hover:border-green-600">{ap}</span>
+                  <span key={ap} onClick={handleNext} className="bg-white text-green-800 px-4 py-2 rounded-full text-xs font-bold shadow-sm cursor-pointer">{ap}</span>
                 ))}
               </div>
             </div>
           )}
         </div>
 
-        <button type="button" onClick={handleNext} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3.5 rounded-full text-xs transition-all">
-          {profile.step === 10 ? "Finish Setup ✓" : "Continue"}
+        <button type="button" onClick={handleNext} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-full text-sm shadow-lg flex items-center justify-center gap-2 relative z-10">
+          {profile.step === 10 ? "Finish Setup" : "Continue"} <ChevronRight size={16} />
         </button>
       </div>
     );
@@ -396,10 +415,11 @@ export default function NourishIQApp() {
             </div>
 
             <div className="space-y-3 mb-6">
-              {DATA_MEALS.map((meal) => (
+              {dataLoading && <p className="text-xs text-gray-400 text-center py-4">Loading real meal photos…</p>}
+              {meals.map((meal: any) => (
                 <div key={meal.id} onClick={() => { setSelectedMeal(meal); setShowRecipeSheet(true); }} className="bg-white rounded-2xl border flex items-center p-2.5 gap-3 cursor-pointer group hover:border-green-200 transition-all">
                   <div className="w-14 h-10 rounded-xl bg-green-600 text-white font-black text-[9px] flex items-center justify-center px-1 text-center">{meal.category}</div>
-                  <DishImage name={meal.name} images={dishImages} className="w-12 h-12 rounded-xl object-cover shadow-inner" />
+                  <DishImage url={meal.imgUrl} className="w-12 h-12 rounded-xl object-cover shadow-inner" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-gray-900 truncate group-hover:text-green-600">{meal.name}</p>
                     <p className="text-[11px] text-gray-500 mt-0.5"><span className="text-orange-500 font-extrabold">{meal.calories}</span> kcal • <span className="text-green-600 font-bold">{meal.protein}g</span> protein</p>
@@ -420,12 +440,16 @@ export default function NourishIQApp() {
             <div className="bg-white border border-neutral-100 rounded-2xl p-4 shadow-sm mb-5 relative overflow-hidden">
               <div className="flex justify-between items-center mb-1">
                 <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-1">📸 Plate Scanner</h4>
-                {scanState === "done" && (
-                  <button type="button" onClick={() => { setScanState("idle"); setScannedFileName(""); }} className="text-[10px] bg-red-500 text-white font-black px-2.5 py-1 rounded-full shadow-sm">Reset</button>
+                {(scanState === "done" || scanState === "error") && (
+                  <button type="button" onClick={() => { setScanState("idle"); setScannedFileName(""); setScanResult(null); setPreviewUrl(null); }} className="text-[10px] bg-red-500 text-white font-black px-2.5 py-1 rounded-full shadow-sm">Reset</button>
                 )}
               </div>
-              <p className="text-[11px] text-gray-400 mb-3">Snap your plate → calories, protein & healthier swap.</p>
-              <p className="text-[10px] text-amber-600 mb-3 italic">Prototype: shows the intended UX flow. Result is illustrative, not computed from the uploaded photo.</p>
+              <p className="text-[11px] text-gray-400 mb-1">Snap your plate → calories, protein & healthier swap.</p>
+              <p className="text-[10px] text-emerald-600 mb-3 italic">Real AI classification — runs in your browser via TensorFlow.js (MobileNet), free and keyless. Calorie/protein values are approximate estimates per recognized food type, not a lab-grade nutrition analysis.</p>
+
+              {previewUrl && (
+                <img ref={imgPreviewRef} src={previewUrl} alt="uploaded" crossOrigin="anonymous" className="hidden" />
+              )}
 
               {scanState === "idle" && (
                 <div className="bg-neutral-50 py-6 rounded-xl border border-dashed border-gray-200 text-center text-gray-400 text-xs font-bold relative hover:bg-neutral-100 transition-all">
@@ -437,26 +461,32 @@ export default function NourishIQApp() {
 
               {scanState === "image_selected" && (
                 <div className="bg-neutral-50 p-4 rounded-xl border border-green-200 text-center animate-fade-in">
+                  {previewUrl && <img src={previewUrl} alt="" className="w-full h-32 object-cover rounded-lg mb-3" />}
                   <p className="text-xs font-bold text-gray-700 truncate mb-2">Selected: {scannedFileName}</p>
-                  <button type="button" onClick={executeScanningSequence} className="w-full bg-green-600 text-white font-black py-2 rounded-xl text-xs shadow-md">Run Macro Analysis</button>
+                  <button type="button" onClick={runRealScan} className="w-full bg-green-600 text-white font-black py-2 rounded-xl text-xs shadow-md">Run Macro Analysis</button>
                 </div>
               )}
 
               {scanState === "scanning" && (
                 <div className="bg-neutral-900 text-white py-6 rounded-xl relative overflow-hidden text-center flex flex-col items-center justify-center">
                   <div className="absolute inset-x-0 h-0.5 bg-green-400 shadow-[0_0_10px_#10b981] animate-bounce w-full top-0" />
-                  <p className="text-xs font-black tracking-widest text-green-400 animate-pulse">READING MEAL IMAGE MATRIX...</p>
+                  <p className="text-xs font-black tracking-widest text-green-400 animate-pulse">RUNNING MOBILENET CLASSIFIER...</p>
                 </div>
               )}
 
-              {scanState === "done" && (
+              {scanState === "done" && scanResult && (
                 <div className="bg-green-50/70 border border-green-200 p-3 rounded-xl text-left animate-fade-in">
-                  <p className="text-xs font-black text-green-700 flex items-center gap-1">✨ Scan Complete (demo result)</p>
+                  <p className="text-xs font-black text-green-700 flex items-center gap-1">✨ Detected: {scanResult.label}</p>
                   <div className="mt-2 space-y-1 text-[11px] text-gray-700 font-medium">
-                    <p>• <span className="font-bold">Estimated Profile:</span> Avocado Toast & Egg</p>
-                    <p>• <span className="font-bold">Calculated Energy:</span> <span className="text-orange-600 font-bold">320 kcal</span> | <span className="text-green-700 font-bold">12g Protein</span></p>
-                    <p className="text-xs font-bold text-emerald-900 mt-2 bg-white p-1.5 rounded border border-green-100">💡 Healthy Swap: Switch white bread for sourdough toast.</p>
+                    <p>• <span className="font-bold">Estimated Energy:</span> <span className="text-orange-600 font-bold">{scanResult.kcal} kcal</span> | <span className="text-green-700 font-bold">{scanResult.protein}g Protein</span></p>
+                    <p className="text-xs font-bold text-emerald-900 mt-2 bg-white p-1.5 rounded border border-green-100">💡 {scanResult.swap}</p>
                   </div>
+                </div>
+              )}
+
+              {scanState === "error" && (
+                <div className="bg-red-50 border border-red-200 p-3 rounded-xl text-xs text-red-700">
+                  Couldn't classify this image — try a clearer, well-lit photo of the food.
                 </div>
               )}
             </div>
@@ -477,23 +507,11 @@ export default function NourishIQApp() {
             <h1 className="font-display text-2xl font-black text-emerald-950 mb-1">Craver</h1>
             <p className="text-xs text-gray-400 font-medium mb-4">Search any dish for a real recipe.</p>
             <div className="flex gap-2 mb-5">
-              <input
-                type="text"
-                value={craverInput}
-                onChange={e => setCraverInput(e.target.value)}
-                placeholder="Type a craving — e.g. chicken curry"
-                className="flex-1 bg-white border rounded-xl px-3 text-xs focus:outline-none text-gray-800"
-              />
-              <button type="button" onClick={handleCraverSearch} className="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl">
-                {craverLoading ? "..." : "Find recipe"}
-              </button>
+              <input type="text" value={craverInput} onChange={e => setCraverInput(e.target.value)} placeholder="Type a craving — e.g. chicken curry" className="flex-1 bg-white border rounded-xl px-3 text-xs focus:outline-none text-gray-800" />
+              <button type="button" onClick={handleCraverSearch} className="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl">{craverLoading ? "..." : "Find recipe"}</button>
             </div>
 
-            {craverNotFound && (
-              <div className="bg-neutral-100 border p-3 rounded-xl text-xs text-gray-600 mb-5">
-                No recipe found for "{craverInput}" — try a more common dish name.
-              </div>
-            )}
+            {craverNotFound && <div className="bg-neutral-100 border p-3 rounded-xl text-xs text-gray-600 mb-5">No recipe found for "{craverInput}" — try a more common dish name.</div>}
 
             {craverResult && (
               <div className="bg-white border rounded-2xl overflow-hidden shadow-sm mb-5">
@@ -507,9 +525,9 @@ export default function NourishIQApp() {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              {CRAVER_DECK.map((pick, i) => (
-                <div key={i} onClick={() => { setCraverInput(pick.name); handleCraverSearch(); }} className="bg-white border rounded-2xl overflow-hidden shadow-sm text-left hover:border-pink-300 transition-colors tap-scale cursor-pointer">
-                  <DishImage name={pick.name} images={dishImages} className="w-full h-24 object-cover" />
+              {craverDeck.map((pick, i) => (
+                <div key={i} onClick={() => { setCraverInput(pick.name); handleCraverSearch(); }} className="bg-white border rounded-2xl overflow-hidden shadow-sm text-left hover:border-pink-300 transition-colors cursor-pointer">
+                  <img src={pick.img} alt="" className="w-full h-24 object-cover" />
                   <div className="p-2.5">
                     <p className="font-bold text-xs text-gray-800">{pick.name}</p>
                     <p className="text-[10px] text-gray-400 mt-0.5">Tap to see recipe</p>
@@ -524,15 +542,14 @@ export default function NourishIQApp() {
           <div className="p-4 animate-fade-in">
             <h1 className="font-display text-2xl font-black text-emerald-950 mb-1">Travel</h1>
             <p className="text-xs text-gray-400 font-medium mb-4">Eat the world from your kitchen ✈️</p>
-            <p className="text-[10px] text-amber-600 mb-4 italic">Currently a static demo dataset (Japan, India) — not yet dynamically personalized.</p>
             <div className="space-y-4">
-              {TRAVEL_CUISINES.map((cu, idx) => (
+              {travelData.map((cu, idx) => (
                 <div key={idx} className="space-y-2">
                   <div className="rounded-2xl p-3 text-white font-bold flex justify-between items-center text-sm" style={{ background: cu.bg }}><span>{cu.country}</span><span className="text-[9px] tracking-wider font-black">{cu.tag}</span></div>
                   <div className="grid grid-cols-2 gap-2">
                     {cu.items.map((item, i) => (
                       <div key={i} className="bg-white border rounded-xl overflow-hidden shadow-sm cursor-pointer">
-                        <DishImage name={item.name} images={dishImages} className="w-full h-24 object-cover" />
+                        <img src={item.img} alt="" className="w-full h-24 object-cover" />
                         <p className="text-xs font-bold p-2 truncate text-gray-800">{item.name}</p>
                       </div>
                     ))}
@@ -563,7 +580,6 @@ export default function NourishIQApp() {
         {activeTab === "Me" && (
           <div className="p-4 animate-fade-in space-y-5">
             <h1 className="font-display text-2xl font-black text-emerald-950 mb-1">Me</h1>
-
             <div className="bg-gradient-to-br from-emerald-600 to-emerald-900 text-white rounded-2xl p-4 shadow-md space-y-3">
               <div className="flex justify-between items-start">
                 <div>
@@ -605,7 +621,7 @@ export default function NourishIQApp() {
               <div>
                 <h5 className="text-xs font-bold text-amber-900 uppercase tracking-wider">Health Framework & Legal Disclaimer</h5>
                 <p className="text-[10px] text-amber-800/80 leading-relaxed mt-1 font-medium">
-                  NourishIQ provides general healthy lifestyle tracking matrices and macro data lookups for informational utility only. This platform is not a certified healthcare provider or clinical diagnostic mechanism.
+                  NourishIQ provides general healthy lifestyle tracking and macro data lookups for informational utility only. This platform is not a certified healthcare provider or clinical diagnostic mechanism.
                 </p>
               </div>
             </div>
@@ -618,7 +634,7 @@ export default function NourishIQApp() {
           <div className="bg-white rounded-t-3xl max-w-md mx-auto w-full p-4 overflow-y-auto max-h-[75vh]" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-2"><span className="text-[9px] px-2 py-0.5 rounded text-white bg-green-600 font-bold">{selectedMeal.category}</span><button type="button" onClick={() => setShowRecipeSheet(false)}><X size={14}/></button></div>
             <h2 className="font-display text-lg font-black text-emerald-950 mb-2">{selectedMeal.name}</h2>
-            <DishImage name={selectedMeal.name} images={dishImages} className="w-full h-36 object-cover rounded-xl mb-3 shadow-inner" />
+            <DishImage url={(selectedMeal as any).imgUrl} className="w-full h-36 object-cover rounded-xl mb-3 shadow-inner" />
             <p className="text-xs text-gray-600 italic mb-4">{selectedMeal.description}</p>
             <button type="button" onClick={() => {
               const items = selectedMeal.ingredients.map(ing => ({ name: ing.name, checked: false }));
