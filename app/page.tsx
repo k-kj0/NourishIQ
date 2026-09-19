@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Bell, ChevronDown, ChevronLeft, ChevronRight, Volume2, Home, 
   Sparkles, Plane, ShoppingBasket, User, X, Plus, Minus, Camera, Award, ShieldAlert
@@ -16,7 +16,6 @@ interface Meal {
   fat: number;
   cookTime: string;
   servings: number;
-  image: string;
   description: string;
   ingredients: { name: string; amount: string }[];
   steps: string[];
@@ -25,7 +24,7 @@ interface Meal {
 const DATA_MEALS: Meal[] = [
   {
     id: "m1",
-    name: "Shakshuka with Feta",
+    name: "Shakshuka",
     category: "BREAKFAST",
     calories: 352,
     protein: 22,
@@ -33,14 +32,13 @@ const DATA_MEALS: Meal[] = [
     fat: 14,
     cookTime: "25 min",
     servings: 1,
-    image: "https://source.unsplash.com/400x300/?shakshuka",
     description: "Rich spiced tomato and pepper sauce with perfectly poached eggs and crumbly feta.",
     ingredients: [{ name: "Eggs", amount: "2 large" }, { name: "Crumbled Feta", amount: "50 g" }],
     steps: ["Cook peppers and spices.", "Add tomato puree and simmer.", "Poach eggs inside."]
   },
   {
     id: "m2",
-    name: "Lemon Herb Chicken Bowl",
+    name: "Chicken Curry",
     category: "LUNCH",
     calories: 480,
     protein: 34,
@@ -48,14 +46,13 @@ const DATA_MEALS: Meal[] = [
     fat: 16,
     cookTime: "30 min",
     servings: 2,
-    image: "https://source.unsplash.com/400x300/?chicken-bowl",
     description: "Citrusy grilled chicken over fluffy quinoa, avocado and crisp greens.",
     ingredients: [{ name: "Chicken breast", amount: "200 g" }, { name: "Cooked quinoa", amount: "1 cup" }],
     steps: ["Marinate chicken.", "Grill chicken.", "Assemble bowls with greens."]
   },
   {
     id: "m3",
-    name: "Chola Masala with Flatbread",
+    name: "Chana Masala",
     category: "DINNER",
     calories: 410,
     protein: 16,
@@ -63,14 +60,13 @@ const DATA_MEALS: Meal[] = [
     fat: 12,
     cookTime: "30 min",
     servings: 2,
-    image: "https://source.unsplash.com/400x300/?chickpea-curry",
     description: "Traditional chickpea curry cooked with spices, served with flatbread.",
     ingredients: [{ name: "Chickpeas", amount: "1.5 cups" }, { name: "Flatbread", amount: "2 pieces" }],
     steps: ["Sauté onions.", "Simmer chickpeas.", "Serve with warm flatbreads."]
   },
   {
     id: "m4",
-    name: "Poha",
+    name: "Rice Pudding",
     category: "SNACK",
     calories: 280,
     protein: 8,
@@ -78,7 +74,6 @@ const DATA_MEALS: Meal[] = [
     fat: 6,
     cookTime: "15 min",
     servings: 1,
-    image: "https://source.unsplash.com/400x300/?poha,rice",
     description: "Fluffy flattened rice seasoned with yellow turmeric, mustard seeds, and peanuts.",
     ingredients: [{ name: "Flattened Rice", amount: "1 cup" }, { name: "Turmeric", amount: "0.5 tsp" }],
     steps: ["Rinse flattened rice.", "Sauté tempering spices.", "Gently mix ingredients."]
@@ -89,15 +84,15 @@ const TRAVEL_CUISINES = [
   {
     country: "Japan", tag: "JP VEGAN", bg: "linear-gradient(135deg, #1e293b 0%, #3b82f6 100%)",
     items: [
-      { name: "Miso Soup", time: "15 min", kcal: "110 kcal", img: "https://source.unsplash.com/400x300/?miso-soup" },
-      { name: "Avocado Sushi", time: "25 min", kcal: "290 kcal", img: "https://source.unsplash.com/400x300/?avocado-sushi" }
+      { name: "Miso Soup", time: "15 min", kcal: "110 kcal" },
+      { name: "Sushi", time: "25 min", kcal: "290 kcal" }
     ]
   },
   {
     country: "India", tag: "IN VEGAN", bg: "linear-gradient(135deg, #db2777 0%, #f43f5e 100%)",
     items: [
-      { name: "Chola Masala with Flatbread", time: "30 min", kcal: "410 kcal", img: "https://source.unsplash.com/400x300/?chickpea-curry" },
-      { name: "Poha", time: "15 min", kcal: "280 kcal", img: "https://source.unsplash.com/400x300/?poha,rice" }
+      { name: "Chana Masala", time: "30 min", kcal: "410 kcal" },
+      { name: "Rice Pudding", time: "15 min", kcal: "280 kcal" }
     ]
   }
 ];
@@ -110,12 +105,12 @@ const APOTHECARY_ITEMS = [
 ];
 
 const CRAVER_DECK = [
-  { name: "Spaghetti", img: "https://source.unsplash.com/400x300/?spaghetti" },
-  { name: "Sushi", img: "https://source.unsplash.com/400x300/?sushi" },
-  { name: "Tacos", img: "https://source.unsplash.com/400x300/?tacos" },
-  { name: "Ramen", img: "https://source.unsplash.com/400x300/?ramen" },
-  { name: "Pizza", img: "https://source.unsplash.com/400x300/?pizza" },
-  { name: "Buddha Bowl", img: "https://source.unsplash.com/400x300/?buddha-bowl" }
+  { name: "Spaghetti" },
+  { name: "Sushi" },
+  { name: "Tacos" },
+  { name: "Ramen" },
+  { name: "Pizza" },
+  { name: "Salad" }
 ];
 
 const DAYS = [
@@ -123,10 +118,67 @@ const DAYS = [
   { day: "THU", date: 25 }, { day: "FRI", date: 26 }, { day: "SAT", date: 27 }, { day: "SUN", date: 28 }
 ];
 
+// --- TheMealDB integration: free, no signup, test API key "1" ---
+
+interface MealDbResult {
+  strMeal: string;
+  strMealThumb: string;
+  strInstructions: string;
+  strCategory: string;
+  strArea: string;
+}
+
+async function fetchDishImage(query: string): Promise<string | null> {
+  try {
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    if (data.meals && data.meals[0]?.strMealThumb) {
+      return data.meals[0].strMealThumb as string;
+    }
+  } catch (e) {
+    // network error or lookup failed — caller falls back to placeholder
+  }
+  return null;
+}
+
+async function fetchRealRecipe(query: string): Promise<MealDbResult | null> {
+  try {
+    const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(query)}`);
+    const data = await res.json();
+    return data.meals ? (data.meals[0] as MealDbResult) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+// Reusable image component: shows a real dish photo if found, otherwise a clean emoji placeholder.
+// Never renders a broken image icon.
+function DishImage({
+  name,
+  images,
+  className,
+  emoji = "🍽️",
+}: {
+  name: string;
+  images: Record<string, string | null>;
+  className: string;
+  emoji?: string;
+}) {
+  const url = images[name];
+  if (url) {
+    return <img src={url} alt={name} className={className} />;
+  }
+  return (
+    <div className={`${className} bg-orange-100 flex items-center justify-center text-lg`}>
+      {emoji}
+    </div>
+  );
+}
+
 export default function NourishIQApp() {
   const [isOnboarded, setIsOnboarded] = useState(false);
   const [activeTab, setActiveTab] = useState("Home");
-  const [selectedDayIndex, setSelectedDayIndex] = useState(5); 
+  const [selectedDayIndex, setSelectedDayIndex] = useState(5);
   const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
   const [showRecipeSheet, setShowRecipeSheet] = useState(false);
   const [showApothecary, setShowApothecary] = useState(false);
@@ -135,7 +187,11 @@ export default function NourishIQApp() {
   const [scanState, setScanState] = useState<"idle" | "image_selected" | "scanning" | "done">("idle");
   const [scannedFileName, setScannedFileName] = useState("");
   const [craverInput, setCraverInput] = useState("");
-  const [craverResult, setCraverResult] = useState<string | null>(null);
+  const [craverResult, setCraverResult] = useState<MealDbResult | null>(null);
+  const [craverLoading, setCraverLoading] = useState(false);
+  const [craverNotFound, setCraverNotFound] = useState(false);
+
+  const [dishImages, setDishImages] = useState<Record<string, string | null>>({});
 
   const [groceryList, setGroceryList] = useState<{ name: string; checked: boolean }[]>([
     { name: "Chicken breast", checked: false }, { name: "Lemon juice", checked: false }
@@ -144,6 +200,21 @@ export default function NourishIQApp() {
   const [profile, setProfile] = useState({
     name: "", step: 1, goal: "Eat cleaner", diet: "Omnivore"
   });
+
+  // Fetch real dish photos on mount for every dish name used across the app.
+  useEffect(() => {
+    const allDishNames = [
+      ...DATA_MEALS.map(m => m.name),
+      ...TRAVEL_CUISINES.flatMap(c => c.items.map(i => i.name)),
+      ...CRAVER_DECK.map(d => d.name),
+    ];
+    const uniqueNames = Array.from(new Set(allDishNames));
+
+    uniqueNames.forEach(async (name) => {
+      const url = await fetchDishImage(name);
+      setDishImages(prev => ({ ...prev, [name]: url }));
+    });
+  }, []);
 
   const speakText = (text: string) => {
     if ("speechSynthesis" in window) {
@@ -163,6 +234,20 @@ export default function NourishIQApp() {
     if (e.target.files && e.target.files[0]) {
       setScannedFileName(e.target.files[0].name);
       setScanState("image_selected");
+    }
+  };
+
+  const handleCraverSearch = async () => {
+    if (!craverInput.trim()) return;
+    setCraverLoading(true);
+    setCraverNotFound(false);
+    setCraverResult(null);
+    const result = await fetchRealRecipe(craverInput);
+    setCraverLoading(false);
+    if (result) {
+      setCraverResult(result);
+    } else {
+      setCraverNotFound(true);
     }
   };
 
@@ -188,7 +273,7 @@ export default function NourishIQApp() {
             <div className="space-y-4">
               <h3 className="text-xl font-bold text-gray-800">Welcome to NourishIQ 🌿</h3>
               <p className="text-xs text-gray-500 max-w-xs mx-auto leading-relaxed bg-white border p-4 rounded-2xl shadow-sm">
-                Personalised meal plans, plate scans, travel cuisine, cravings, and DIY apothecary — matching your mockup sheets perfectly.
+                Personalised meal plans, plate scans, travel cuisine, cravings, and DIY apothecary.
               </p>
             </div>
           )}
@@ -285,7 +370,7 @@ export default function NourishIQApp() {
   return (
     <div className="min-h-screen flex flex-col max-w-md mx-auto relative bg-[#FCFBF7] shadow-2xl overflow-hidden">
       <div className="flex-1 overflow-y-auto pb-24 scrollbar-hide">
-        
+
         {activeTab === "Home" && (
           <div className="p-4 animate-fade-in">
             <div className="flex items-center justify-between mb-4">
@@ -314,7 +399,7 @@ export default function NourishIQApp() {
               {DATA_MEALS.map((meal) => (
                 <div key={meal.id} onClick={() => { setSelectedMeal(meal); setShowRecipeSheet(true); }} className="bg-white rounded-2xl border flex items-center p-2.5 gap-3 cursor-pointer group hover:border-green-200 transition-all">
                   <div className="w-14 h-10 rounded-xl bg-green-600 text-white font-black text-[9px] flex items-center justify-center px-1 text-center">{meal.category}</div>
-                  <img src={meal.image} alt="" className="w-12 h-12 rounded-xl object-cover shadow-inner" />
+                  <DishImage name={meal.name} images={dishImages} className="w-12 h-12 rounded-xl object-cover shadow-inner" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-bold text-gray-900 truncate group-hover:text-green-600">{meal.name}</p>
                     <p className="text-[11px] text-gray-500 mt-0.5"><span className="text-orange-500 font-extrabold">{meal.calories}</span> kcal • <span className="text-green-600 font-bold">{meal.protein}g</span> protein</p>
@@ -332,7 +417,6 @@ export default function NourishIQApp() {
               <div onClick={() => setActiveTab("Craver")} className="p-4 rounded-2xl text-white bg-gradient-to-br from-pink-500 to-rose-500 cursor-pointer shadow-md"><p className="font-bold text-sm">Craver</p></div>
             </div>
 
-            {/* REAL USER IMAGE-UPLOAD SELECTION GATEWAY SCANNER */}
             <div className="bg-white border border-neutral-100 rounded-2xl p-4 shadow-sm mb-5 relative overflow-hidden">
               <div className="flex justify-between items-center mb-1">
                 <h4 className="text-xs font-bold text-emerald-950 flex items-center gap-1">📸 Plate Scanner</h4>
@@ -341,6 +425,7 @@ export default function NourishIQApp() {
                 )}
               </div>
               <p className="text-[11px] text-gray-400 mb-3">Snap your plate → calories, protein & healthier swap.</p>
+              <p className="text-[10px] text-amber-600 mb-3 italic">Prototype: shows the intended UX flow. Result is illustrative, not computed from the uploaded photo.</p>
 
               {scanState === "idle" && (
                 <div className="bg-neutral-50 py-6 rounded-xl border border-dashed border-gray-200 text-center text-gray-400 text-xs font-bold relative hover:bg-neutral-100 transition-all">
@@ -366,7 +451,7 @@ export default function NourishIQApp() {
 
               {scanState === "done" && (
                 <div className="bg-green-50/70 border border-green-200 p-3 rounded-xl text-left animate-fade-in">
-                  <p className="text-xs font-black text-green-700 flex items-center gap-1">✨ Computer-Vision Scan Complete</p>
+                  <p className="text-xs font-black text-green-700 flex items-center gap-1">✨ Scan Complete (demo result)</p>
                   <div className="mt-2 space-y-1 text-[11px] text-gray-700 font-medium">
                     <p>• <span className="font-bold">Estimated Profile:</span> Avocado Toast & Egg</p>
                     <p>• <span className="font-bold">Calculated Energy:</span> <span className="text-orange-600 font-bold">320 kcal</span> | <span className="text-green-700 font-bold">12g Protein</span></p>
@@ -390,20 +475,44 @@ export default function NourishIQApp() {
         {activeTab === "Craver" && (
           <div className="p-4 animate-fade-in">
             <h1 className="font-display text-2xl font-black text-emerald-950 mb-1">Craver</h1>
-            <p className="text-xs text-gray-400 font-medium mb-4">Recommendations matching goal: <span className="text-green-600 font-bold">&quot;{profile.goal}&quot;</span></p>
+            <p className="text-xs text-gray-400 font-medium mb-4">Search any dish for a real recipe.</p>
             <div className="flex gap-2 mb-5">
-              <input type="text" value={craverInput} onChange={e => setCraverInput(e.target.value)} placeholder="Type a craving — e.g. spaghetti meatballs" className="flex-1 bg-white border rounded-xl px-3 text-xs focus:outline-none text-gray-800" />
-              <button type="button" onClick={() => { if(craverInput.trim()) setCraverResult(`Crafting macro-balanced ${craverInput} alternative...`); }} className="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl">Find recipe</button>
+              <input
+                type="text"
+                value={craverInput}
+                onChange={e => setCraverInput(e.target.value)}
+                placeholder="Type a craving — e.g. chicken curry"
+                className="flex-1 bg-white border rounded-xl px-3 text-xs focus:outline-none text-gray-800"
+              />
+              <button type="button" onClick={handleCraverSearch} className="bg-gradient-to-r from-pink-500 to-rose-500 text-white font-bold text-xs px-4 py-2.5 rounded-xl">
+                {craverLoading ? "..." : "Find recipe"}
+              </button>
             </div>
-            {craverResult && <div className="bg-pink-50 border border-pink-100 p-3 rounded-xl text-xs text-pink-900 mb-5 font-bold">{craverResult}</div>}
-            
+
+            {craverNotFound && (
+              <div className="bg-neutral-100 border p-3 rounded-xl text-xs text-gray-600 mb-5">
+                No recipe found for "{craverInput}" — try a more common dish name.
+              </div>
+            )}
+
+            {craverResult && (
+              <div className="bg-white border rounded-2xl overflow-hidden shadow-sm mb-5">
+                <img src={craverResult.strMealThumb} alt={craverResult.strMeal} className="w-full h-40 object-cover" />
+                <div className="p-3">
+                  <p className="font-bold text-sm text-gray-900">{craverResult.strMeal}</p>
+                  <p className="text-[10px] text-gray-400 mb-2">{craverResult.strArea} · {craverResult.strCategory}</p>
+                  <p className="text-xs text-gray-600 leading-relaxed line-clamp-4">{craverResult.strInstructions}</p>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 gap-3">
               {CRAVER_DECK.map((pick, i) => (
-                <div key={i} onClick={() => { setCraverInput(pick.name); setCraverResult(`Perfect! Generating options layouts for ${pick.name}...`); }} className="bg-white border rounded-2xl overflow-hidden shadow-sm text-left hover:border-pink-300 transition-colors tap-scale">
-                  <img src={pick.img} alt="" className="w-full h-24 object-cover" />
+                <div key={i} onClick={() => { setCraverInput(pick.name); handleCraverSearch(); }} className="bg-white border rounded-2xl overflow-hidden shadow-sm text-left hover:border-pink-300 transition-colors tap-scale cursor-pointer">
+                  <DishImage name={pick.name} images={dishImages} className="w-full h-24 object-cover" />
                   <div className="p-2.5">
                     <p className="font-bold text-xs text-gray-800">{pick.name}</p>
-                    <p className="text-[10px] text-gray-400 mt-0.5">Tap to craft recipe</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">Tap to see recipe</p>
                   </div>
                 </div>
               ))}
@@ -415,6 +524,7 @@ export default function NourishIQApp() {
           <div className="p-4 animate-fade-in">
             <h1 className="font-display text-2xl font-black text-emerald-950 mb-1">Travel</h1>
             <p className="text-xs text-gray-400 font-medium mb-4">Eat the world from your kitchen ✈️</p>
+            <p className="text-[10px] text-amber-600 mb-4 italic">Currently a static demo dataset (Japan, India) — not yet dynamically personalized.</p>
             <div className="space-y-4">
               {TRAVEL_CUISINES.map((cu, idx) => (
                 <div key={idx} className="space-y-2">
@@ -422,7 +532,7 @@ export default function NourishIQApp() {
                   <div className="grid grid-cols-2 gap-2">
                     {cu.items.map((item, i) => (
                       <div key={i} className="bg-white border rounded-xl overflow-hidden shadow-sm cursor-pointer">
-                        <img src={item.img} alt="" className="w-full h-24 object-cover" />
+                        <DishImage name={item.name} images={dishImages} className="w-full h-24 object-cover" />
                         <p className="text-xs font-bold p-2 truncate text-gray-800">{item.name}</p>
                       </div>
                     ))}
@@ -453,7 +563,7 @@ export default function NourishIQApp() {
         {activeTab === "Me" && (
           <div className="p-4 animate-fade-in space-y-5">
             <h1 className="font-display text-2xl font-black text-emerald-950 mb-1">Me</h1>
-            
+
             <div className="bg-gradient-to-br from-emerald-600 to-emerald-900 text-white rounded-2xl p-4 shadow-md space-y-3">
               <div className="flex justify-between items-start">
                 <div>
@@ -508,7 +618,7 @@ export default function NourishIQApp() {
           <div className="bg-white rounded-t-3xl max-w-md mx-auto w-full p-4 overflow-y-auto max-h-[75vh]" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-2"><span className="text-[9px] px-2 py-0.5 rounded text-white bg-green-600 font-bold">{selectedMeal.category}</span><button type="button" onClick={() => setShowRecipeSheet(false)}><X size={14}/></button></div>
             <h2 className="font-display text-lg font-black text-emerald-950 mb-2">{selectedMeal.name}</h2>
-            <img src={selectedMeal.image} alt="" className="w-full h-36 object-cover rounded-xl mb-3 shadow-inner" />
+            <DishImage name={selectedMeal.name} images={dishImages} className="w-full h-36 object-cover rounded-xl mb-3 shadow-inner" />
             <p className="text-xs text-gray-600 italic mb-4">{selectedMeal.description}</p>
             <button type="button" onClick={() => {
               const items = selectedMeal.ingredients.map(ing => ({ name: ing.name, checked: false }));
