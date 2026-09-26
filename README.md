@@ -7,15 +7,23 @@ Full-stack AI nutrition app. A Gemini-powered agent turns stated dietary goals i
 ## What it does
 
 - Takes your dietary goals and preferences as input
-- Generates personalized meal plans via a Gemini-powered agent
-- Plate-scan feature: [describe what this actually does — image input? nutrition estimate?]
-- Travel-cuisine feature: [describe — adapts meal plans to a destination's local food?]
+- Generates personalized meal plans via a Gemini-powered agent, shown with calories and protein per meal, plus a daily micronutrient summary (iron, magnesium, zinc, calcium)
+- **Plate Scanner**: snap a photo of your plate and get an estimated calorie/protein breakdown plus a healthier-swap suggestion. Runs entirely in the browser using TensorFlow.js (MobileNet), so it's free and doesn't need an API key. Values are approximate estimates per recognized food, not a lab-grade nutrition analysis.
+- **Travel Cuisine**: browse dishes by country (currently Japan, India, Italy) and get real recipes for cooking that country's food at home instead of ordering out
+- **Craver**: search any dish by name and get a real recipe back
+- Grocery list: add ingredients from any recipe and check them off while shopping
 
-## Tech stack
+## Project structure
 
-- Frontend: React (Next.js)
-- Backend: FastAPI
-- AI: Google Gemini
+```
+app/
+lib/
+mealData.ts # meal plan data and nutrition values
+globals.css # global styles
+layout.tsx # app shell/layout
+page.tsx # main UI: home, plate scanner, travel cuisine, craver, grocery
+
+...
 
 ## Local setup
 
@@ -23,14 +31,13 @@ Full-stack AI nutrition app. A Gemini-powered agent turns stated dietary goals i
 git clone https://github.com/k-kj0/NourishIQ.git
 cd NourishIQ
 npm install
-# [add backend setup steps, env vars needed for Gemini API key, etc.]
-npm run dev
 ```
 
-## Project structure
+Create a `.env.local` file in the project root with:
 
-[List the actual folders once you confirm them — the file tree shown on GitHub is just `app/`, config files. Add a real breakdown.]
 
-## License
+Then run:
 
-MIT
+```bash
+npm run dev
+```
