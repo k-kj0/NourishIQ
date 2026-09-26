@@ -17,13 +17,12 @@ Full-stack AI nutrition app. A Gemini-powered agent turns stated dietary goals i
 
 ```
 app/
-lib/
-mealData.ts # meal plan data and nutrition values
-globals.css # global styles
-layout.tsx # app shell/layout
-page.tsx # main UI: home, plate scanner, travel cuisine, craver, grocery
-
-...
+  lib/
+    mealData.ts     # meal plan data and nutrition values
+  globals.css        # global styles
+  layout.tsx         # app shell/layout
+  page.tsx           # main UI: home, plate scanner, travel cuisine, craver, grocery
+```
 
 ## Local setup
 
@@ -35,9 +34,16 @@ npm install
 
 Create a `.env.local` file in the project root with:
 
+```
+GEMINI_API_KEY=your_key_here
+```
 
 Then run:
 
 ```bash
 npm run dev
 ```
+
+## License
+
+MIT
